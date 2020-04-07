@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
-
+  
 import serial
 import mysql.connector, sys
 import os
