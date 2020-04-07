@@ -31,7 +31,7 @@ def keys():                                # Получить ключи к ба
 def error_log(error_name, error_description):   #   подпрограмма записи логов ошибок
     current_time = dt.datetime.utcnow() + dt.timedelta(hours=3)    # текущее время в Москве
     current_time = current_time.strftime("%d-%m-%Y %H:%M")
-    full_log_line = str(current_time) + ' - ' + 'main.py' + ' - ' + error_name + ' - ' + error_description 
+    full_log_line = str(current_time) + ' - ' + 'main.py' + ' - ' + str(error_name) + ' - ' + str(error_description) 
     f = open("/home/pi/sh/python/logs/errors.log", "a")   
     f.write(full_log_line)
     f.write("  \n") 
@@ -40,15 +40,22 @@ def error_log(error_name, error_description):   #   подпрограмма з�
 
 
 ser = serial.Serial("/dev/ttyUSB0", 19200, timeout=2, writeTimeout=1)
-
 ser.write(b'0')
+try:
+    rb1 = int(ser.read(3))
+    rb2 = int(ser.read(3))
+    rb3 = int(ser.read(3))
+    print ("G status:",  rb1)
+    print ("G status:",  rb2)
+    print ("G status:",  rb3)
 
-rb1=ser.read(3)
-rb2=ser.read(3)
-rb3=ser.read(3)
-print ("G status:",  rb1)
-print ("G status:",  rb2)
-print ("G status:",  rb3)
+except ValueError:
+    print(ValueError)
+    error_log('<ValueError>','Нет связи с МКк')
+    ser.close()
+    exit()
+
+
 
 
 user_value, db_value, pw_value = keys()    #   Cчитать пароль к базе данных
