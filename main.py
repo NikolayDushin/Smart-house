@@ -56,41 +56,52 @@ def info_for_reboot_chart(MK):                   #   Записать инфо �
     cnx.commit()
 
 def status_MK_update(status_MK, number_MK):
-      Status_MKk = """UPDATE `status_mk` SET w_s=%s WHERE w_s_id=%s"""
-      datas = (status_MK, number_MK)    
-      cursor.execute(Status_MKk,datas)
-      cnx.commit()
+    Status_MKk = """UPDATE `status_mk` SET w_s=%s WHERE w_s_id=%s"""
+    datas = (status_MK, number_MK)    
+    cursor.execute(Status_MKk,datas)
+    cnx.commit()
     
 
 
 def data_processing(in_info):                    #   Обработка информации от МК     
+
     print(in_info)
+
     if in_info == b'000000000':
         ser.close()
         exit() 
     elif in_info == b'000001000':                #   Инфо о перезагрузке МКк
-      #ser.write(b'c')                           #   Отключение цикла опроса на МКк
-      #ser.write(b'010')
-      logs(text_info, d)
-      MK = 'MKk'                                 #   Записать логи        
-      info_for_reboot_chart(MK)                  #   Записать инфу в таблицу
-      ser.write(b'D')
-      ser.write(d1.encode("utf-8"))
-      status_MK = 1
-      MK_number = 1
-      status_MK_update(status_MK, MK_number)    # Запись статуса МКк в таблицу
-      status_MK = 0
-      MK_number = 3
-      status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу
-      status_MK = 0
-      MK_number = 4
-      status_MK_update(status_MK, MK_number)    # Запись статуса МКт в таблицу
-      status_MK = 0
-      MK_number = 5
-      status_MK_update(status_MK, MK_number)    # Запись статуса МКг в таблицу
+        #ser.write(b'c')                          #   Отключение цикла опроса на МКк
+        #ser.write(b'010')
+        logs(text_info, d)                       #   Записать логи
+        MK = 'MKk'                                       
+        info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
+        ser.write(b'D')
+        ser.write(d1.encode("utf-8"))
+        status_MK = 1
+        MK_number = 1
+        status_MK_update(status_MK, MK_number)    # Запись статуса МКк в таблицу 
+        status_MK = 0
+        MK_number = 3
+        status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу
+        status_MK = 0
+        MK_number = 4
+        status_MK_update(status_MK, MK_number)    # Запись статуса МКт в таблицу
+        status_MK = 0
+        MK_number = 5
+        status_MK_update(status_MK, MK_number)    # Запись статуса МКг в таблицу
 
+    elif in_info == b'000003000':                #   Инфо о перезагрузке МКп
+        #ser.write(b'c')
+        #ser.write(b'030')
+        logs(text_info, d)
+        MK = 'MKp'
+        info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
+        status_MK = 1
+        MK_number = 3
+        status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу
 
-
+     
 
 
 
@@ -118,19 +129,16 @@ except ValueError:
     ser.close()
     exit()
 
-user_value, db_value, pw_value = keys()    #   Cчитать пароль к базе данных
-
+user_value, db_value, pw_value = keys()          #   Cчитать пароль к базе данных
 cnx = mysql.connector.connect(user = user_value, database = db_value, password = pw_value)
 cursor = cnx.cursor()
-
-LogON = 0
 
 current_time = dt.datetime.utcnow() + dt.timedelta(hours=3)   #   Текущее время
 d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000001000'
+text_info = b'000003000'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
@@ -189,7 +197,7 @@ if int(rb1) == 0:                          #   Перезагрузка МКк
 
 
 if int(rb1) == 0:                          #   Перезагрузка МКп 
-   if int(rb2) == 3 and int(rb3) == 0 :
+   if int(rb2) == 3 and int(rb3) == 10 :
       ser.write(b'c')
       ser.write(b'030')
       LogON = 1
@@ -569,16 +577,16 @@ if int(rb1) == 0:                                          #   Сигнал вы
       cnx.commit()
 
 
-if LogON == 1:
-    f = open("/home/pi/sh/python/logs/main_log.txt", "a")
-    f.write(rb1.decode("utf-8") + ' ')
-    f.write(rb2.decode("utf-8")+ ' ')
-    f.write(rb3.decode("utf-8")+ ' ')
-    f.write(" -  ") 
-    f.write(d)
-    f.write(" - main.py")
-    f.write("  \n")
-    f.close()
+#if LogON == 1:
+#    f = open("/home/pi/sh/python/logs/main_log.txt", "a")
+#    f.write(rb1.decode("utf-8") + ' ')
+#    f.write(rb2.decode("utf-8")+ ' ')
+#    f.write(rb3.decode("utf-8")+ ' ')
+#    f.write(" -  ") 
+#    f.write(d)
+#    f.write(" - main.py")
+#    f.write("  \n")
+#    f.close()
 
 
 
