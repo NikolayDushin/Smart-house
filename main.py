@@ -46,7 +46,7 @@ def logs(text_info, d):                   #   Запись логов
     f.write("  \n")
     f.close()
 
-def info_for_reboot_chart(MK):               #   Записать инфо о перезагрузке в таблицу
+def info_for_reboot_chart(MK):                   #   Записать инфо о перезагрузке в таблицу
     cursor.execute("SELECT * from reboot")
     rows = cursor.fetchall()
     last_line = cursor.rowcount
@@ -55,21 +55,33 @@ def info_for_reboot_chart(MK):               #   Записать инфо о п
     cursor.execute("""INSERT INTO reboot VALUES (%s,%s,%s,%s)""",(r_id, d, MK, event)) 
     cnx.commit()
 
-def data_processing(in_info):              #   Обработка информации от МК     
+
+
+
+def data_processing(in_info):                    #   Обработка информации от МК     
     print(in_info)
     if in_info == b'000000000':
         ser.close()
         exit() 
-          
-    elif in_info == b'000001000':          #   Инфо о перезагрузке МКк
-      #ser.write(b'c')                      #   Отключение цикла опроса на МКк
+    elif in_info == b'000001000':                #   Инфо о перезагрузке МКк
+      #ser.write(b'c')                           #   Отключение цикла опроса на МКк
       #ser.write(b'010')
       logs(text_info, d)
       MK = 'MKk'                                 #   Записать логи        
-      info_for_reboot_chart(MK)
+      info_for_reboot_chart(MK)                  #   Записать инфу в таблицу
+      ser.write(b'D')
+      ser.write(d1.encode("utf-8"))
+
+      #Status_MKk = """UPDATE `status_mk` SET w_s=%s WHERE w_s_id=%s"""
+      #datas = (1, 1)    
+      #cursor.execute(Status_MKk,datas)
+      #cnx.commit()
 
 
-######
+
+
+
+#############################
 
 ser = serial.Serial("/dev/ttyUSB0", 19200, timeout=2, writeTimeout=1)
 ser.write(b'0')
