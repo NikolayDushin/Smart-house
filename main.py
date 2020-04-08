@@ -37,13 +37,14 @@ def error_log(error_name, error_description):   #   подпрограмма з�
     f.write("  \n") 
     f.close()
 
-def logs(text_info, d):                   #   Запись логов
+def logs(text_info, d, log_info):                   #   Запись логов
     f = open("/home/pi/sh/python/logs/main_log.txt", "a")
-    f.write(text_info.decode("utf-8") + ' ') 
-    f.write(" -  ") 
-    f.write(d)
-    f.write(" - main.py")
-    f.write("  \n")
+    f.write(text_info.decode("utf-8") + '  -  ' + d + '  -  main.py  -  ' + log_info)
+    #f.write(text_info.decode("utf-8") + ' ') 
+    #f.write(" -  ") 
+    #f.write(d)
+    #f.write(" - main.py")
+    f.write("\n")
     f.close()
 
 def info_for_reboot_chart(MK):                   #   Записать инфо о перезагрузке в таблицу
@@ -71,7 +72,7 @@ def data_processing(in_info):                    #   Обработка инфо
     elif in_info == b'000001000':                #   Инфо о перезагрузке МКк
         ser.write(b'c')                          #   Отключение цикла опроса на МКк
         ser.write(b'010')
-        logs(text_info, d)                       #   Записать логи
+        logs(text_info, d, 'Перезагрузка МКк')                       #   Записать логи
         MK = 'MKk'                                       
         info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
         ser.write(b'D')
@@ -92,17 +93,41 @@ def data_processing(in_info):                    #   Обработка инфо
     elif in_info == b'000003000':                #   Инфо о перезагрузке МКп
         ser.write(b'c')
         ser.write(b'030')
-        logs(text_info, d)
+        logs(text_info, d, 'Перезагрузка МКп')
         MK = 'MKp'
         info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
         status_MK = 1
         MK_number = 3
-        status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу
+        status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу status_mk
+
+    elif in_info == b'000003002':                #   Потеря связи с МКп
+        #ser.write(b'c')
+        #ser.write(b'032')
+        logs(text_info, d, 'Потеря связи с МКп')
+        event = "MKp turned off"
+        MK = 'MKp'
+        info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
+        status_MK = 0
+        MK_number = 3
+        status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу status_mk
+
+
+ 
+
+
+
+
+
+
+
+
+
+
 
     elif in_info == b'000004000':                #   Инфо о перезагрузке МКт     
         ser.write(b'c')
         ser.write(b'040')
-        logs(text_info, d)
+        logs(text_info, d, 'Перезагрузка МКт')
         MK = 'MKt'
         info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
         status_MK = 1
@@ -148,7 +173,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-#text_info = b'000004000'
+text_info = b'000003002'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
@@ -224,8 +249,11 @@ if int(rb1) == 0:                          #   Перезагрузка МКп
       cursor.execute(Status_MKk,datas)
       cnx.commit()
 
+
+
+
 if int(rb1) == 0:                              #   Сигнал выключения МКп  
-   if int(rb2) == 3 and int(rb3) == 2 :
+   if int(rb2) == 3 and int(rb3) == 20 :
       ser.write(b'c')
       ser.write(b'032')
       LogON = 1
