@@ -37,7 +37,29 @@ def error_log(error_name, error_description):   #   подпрограмма з�
     f.write("  \n") 
     f.close()
 
+def logs(text_info, d):                   #   Запись логов
+    f = open("/home/pi/sh/python/logs/main_log.txt", "a")
+    f.write(text_info.decode("utf-8") + ' ') 
+    f.write(" -  ") 
+    f.write(d)
+    f.write(" - main.py")
+    f.write("  \n")
+    f.close()
 
+def data_processing(in_info):              #   Обработка информации от МК     
+    print(in_info)
+    if in_info == b'000000000':
+        ser.close()
+        exit() 
+          
+    elif in_info == b'000001000':          #   Инфо о перезагрузке МКк
+      #ser.write(b'c')                      #   Отключение цикла опроса на МКк
+      #ser.write(b'010')
+      logs(text_info, d)                                 #   Записать логи        
+
+
+
+######
 
 ser = serial.Serial("/dev/ttyUSB0", 19200, timeout=2, writeTimeout=1)
 ser.write(b'0')
@@ -71,10 +93,15 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
+text_info = b'000001000'
+
+data_processing(text_info)                     #   Обработать входящую информацию
+
+
 
 
 if int(rb1) == 0:                          #   Перезагрузка МКк
-   if int(rb2) == 1 and int(rb3) == 0 :
+   if int(rb2) == 1 and int(rb3) == 10 :
       ser.write(b'c')                      #   Отключение цикла опроса на МКк
       ser.write(b'010')
       LogON = 1                                 #   Записать логи  
