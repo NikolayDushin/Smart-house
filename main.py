@@ -62,6 +62,18 @@ def status_MK_update(status_MK, number_MK):
     cursor.execute(Status_MKk,datas)
     cnx.commit()
 
+def plintus(status_plintus):
+    cursor.execute("SELECT * from plintus")
+    rows = cursor.fetchall()
+    last_line = cursor.rowcount
+    cursor.execute("SELECT p_status from plintus WHERE p_id = %s"%(last_line))
+    result = cursor.fetchone() 
+    if result[0] == "1":
+        p_id = last_line + 1      
+        cursor.execute("""INSERT INTO plintus VALUES (%s,%s,%s)""",(p_id, d, status_plintus)) 
+        cnx.commit()
+
+
 def data_processing(in_info):                    #   Обработка информации от МК     
 
     print(in_info)
@@ -116,11 +128,17 @@ def data_processing(in_info):                    #   Обработка инфо
         ser.write(b'033')
         #logs(text_info, d, 'Потеря связи с МКп')
 
+    elif in_info == b'000003005':                 #   Сигнал включения плинтуса
+        #ser.write(b'c')
+        #ser.write('035')
+        logs(text_info, d, 'Включение плинтуса')
+        plintus(1)
 
-
-
-
-
+    elif in_info == b'000003006':                 #   Сигнал выключения плинтуса
+        #ser.write(b'c')
+        #ser.write('036')
+        logs(text_info, d, 'Выключение плинтуса')
+        plintus(0)
 
 
 
@@ -174,7 +192,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000003000'
+text_info = b'000003006'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
@@ -278,7 +296,7 @@ if int(rb1) == 0:
       LogON = 1
 
 if int(rb1) == 0:                               #   Сигнал включения плинтуса
-   if int(rb2) == 3 and int(rb3) == 5:
+   if int(rb2) == 3 and int(rb3) == 50:
       ser.write(b'c')
       ser.write('035')
       LogON = 1
@@ -293,7 +311,7 @@ if int(rb1) == 0:                               #   Сигнал включен�
          cnx.commit()
 
 if int(rb1) == 0:                               #   Сигнал выключения плинтуса 
-   if int(rb2) == 3 and int(rb3) == 6:
+   if int(rb2) == 3 and int(rb3) == 60:
       ser.write(b'c')
       ser.write(b'036')
       LogON = 1
