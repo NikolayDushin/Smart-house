@@ -46,6 +46,15 @@ def logs(text_info, d):                   #   Запись логов
     f.write("  \n")
     f.close()
 
+def info_for_reboot_chart(MK):               #   Записать инфо о перезагрузке в таблицу
+    cursor.execute("SELECT * from reboot")
+    rows = cursor.fetchall()
+    last_line = cursor.rowcount
+    r_id = last_line + 1
+    event = "Reboot of MK"
+    cursor.execute("""INSERT INTO reboot VALUES (%s,%s,%s,%s)""",(r_id, d, MK, event)) 
+    cnx.commit()
+
 def data_processing(in_info):              #   Обработка информации от МК     
     print(in_info)
     if in_info == b'000000000':
@@ -55,8 +64,9 @@ def data_processing(in_info):              #   Обработка информа
     elif in_info == b'000001000':          #   Инфо о перезагрузке МКк
       #ser.write(b'c')                      #   Отключение цикла опроса на МКк
       #ser.write(b'010')
-      logs(text_info, d)                                 #   Записать логи        
-
+      logs(text_info, d)
+      MK = 'MKk'                                 #   Записать логи        
+      info_for_reboot_chart(MK)
 
 
 ######
