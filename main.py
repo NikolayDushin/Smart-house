@@ -60,8 +60,6 @@ def status_MK_update(status_MK, number_MK):
     datas = (status_MK, number_MK)    
     cursor.execute(Status_MKk,datas)
     cnx.commit()
-    
-
 
 def data_processing(in_info):                    #   Обработка информации от МК     
 
@@ -71,8 +69,8 @@ def data_processing(in_info):                    #   Обработка инфо
         ser.close()
         exit() 
     elif in_info == b'000001000':                #   Инфо о перезагрузке МКк
-        #ser.write(b'c')                          #   Отключение цикла опроса на МКк
-        #ser.write(b'010')
+        ser.write(b'c')                          #   Отключение цикла опроса на МКк
+        ser.write(b'010')
         logs(text_info, d)                       #   Записать логи
         MK = 'MKk'                                       
         info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
@@ -92,8 +90,8 @@ def data_processing(in_info):                    #   Обработка инфо
         status_MK_update(status_MK, MK_number)    # Запись статуса МКг в таблицу
 
     elif in_info == b'000003000':                #   Инфо о перезагрузке МКп
-        #ser.write(b'c')
-        #ser.write(b'030')
+        ser.write(b'c')
+        ser.write(b'030')
         logs(text_info, d)
         MK = 'MKp'
         info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
@@ -101,13 +99,25 @@ def data_processing(in_info):                    #   Обработка инфо
         MK_number = 3
         status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу
 
-     
+    elif in_info == b'000004000':                #   Инфо о перезагрузке МКт     
+        ser.write(b'c')
+        ser.write(b'040')
+        logs(text_info, d)
+        MK = 'MKt'
+        info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
+        status_MK = 1
+        MK_number = 4
+        status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу
 
 
 
 
 
-#############################
+
+
+
+
+#############################   Main
 
 ser = serial.Serial("/dev/ttyUSB0", 19200, timeout=2, writeTimeout=1)
 ser.write(b'0')
@@ -138,12 +148,16 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000003000'
+#text_info = b'000004000'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
 
 
+
+
+
+#############################   OLD
 
 if int(rb1) == 0:                          #   Перезагрузка МКк
    if int(rb2) == 1 and int(rb3) == 10 :
@@ -190,10 +204,6 @@ if int(rb1) == 0:                          #   Перезагрузка МКк
 
 
 
-#cursor.close()
-#cnx.close()
-#ser.close()
-#exit()
 
 
 if int(rb1) == 0:                          #   Перезагрузка МКп 
@@ -334,7 +344,7 @@ if int(rb1) == 0:                                 #   Сигнал выключ�
 
 
 if int(rb1) == 0:                                      #   Перезагрузка МКт
-   if int(rb2) == 4 and int(rb3) == 0:
+   if int(rb2) == 4 and int(rb3) == 10:
       ser.write(b'c')
       ser.write(b'040')
       LogON = 1
