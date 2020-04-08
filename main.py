@@ -55,7 +55,12 @@ def info_for_reboot_chart(MK):                   #   Записать инфо �
     cursor.execute("""INSERT INTO reboot VALUES (%s,%s,%s,%s)""",(r_id, d, MK, event)) 
     cnx.commit()
 
-
+def status_MK_update(status_MK, number_MK):
+      Status_MKk = """UPDATE `status_mk` SET w_s=%s WHERE w_s_id=%s"""
+      datas = (status_MK, number_MK)    
+      cursor.execute(Status_MKk,datas)
+      cnx.commit()
+    
 
 
 def data_processing(in_info):                    #   Обработка информации от МК     
@@ -71,11 +76,21 @@ def data_processing(in_info):                    #   Обработка инфо
       info_for_reboot_chart(MK)                  #   Записать инфу в таблицу
       ser.write(b'D')
       ser.write(d1.encode("utf-8"))
+      status_MK = 1
+      MK_number = 1
+      status_MK_update(status_MK, MK_number)    # Запись статуса МКк в таблицу
+      status_MK = 0
+      MK_number = 3
+      status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу
+      status_MK = 0
+      MK_number = 4
+      status_MK_update(status_MK, MK_number)    # Запись статуса МКт в таблицу
+      status_MK = 0
+      MK_number = 5
+      status_MK_update(status_MK, MK_number)    # Запись статуса МКг в таблицу
 
-      #Status_MKk = """UPDATE `status_mk` SET w_s=%s WHERE w_s_id=%s"""
-      #datas = (1, 1)    
-      #cursor.execute(Status_MKk,datas)
-      #cnx.commit()
+
+
 
 
 
@@ -146,6 +161,7 @@ if int(rb1) == 0:                          #   Перезагрузка МКк
       datas = (1, 1)    
       cursor.execute(Status_MKk,datas)
       cnx.commit()
+
       ###   При выключении МКк, статус МКп - выключен   #####################      
       Status_MKk = """UPDATE `status_mk` SET w_s=%s WHERE w_s_id=%s"""
       datas = (0, 3)    
