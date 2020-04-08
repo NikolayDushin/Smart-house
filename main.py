@@ -42,21 +42,22 @@ def error_log(error_name, error_description):   #   подпрограмма з�
 ser = serial.Serial("/dev/ttyUSB0", 19200, timeout=2, writeTimeout=1)
 ser.write(b'0')
 try:
-    rb1 = int(ser.read(3))
-    rb2 = int(ser.read(3))
-    rb3 = int(ser.read(3))
+    rb1 = ser.read(3)
+    rb2 = ser.read(3)
+    rb3 = ser.read(3)
+    text_info = rb1 + rb2 + rb1
     print ("G status:",  rb1)
     print ("G status:",  rb2)
     print ("G status:",  rb3)
+    rb1 = int(rb1)
+    rb2 = int(rb2)
+    rb3 = int(rb3)
 
 except ValueError:
     print(ValueError)
     error_log('<ValueError>','Нет связи с МКк')
     ser.close()
     exit()
-
-
-
 
 user_value, db_value, pw_value = keys()    #   Cчитать пароль к базе данных
 
