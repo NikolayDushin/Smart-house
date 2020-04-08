@@ -47,12 +47,12 @@ def logs(text_info, d, log_info):                   #   Запись логов
     f.write("\n")
     f.close()
 
-def info_for_reboot_chart(MK):                   #   Записать инфо о перезагрузке в таблицу
+def info_for_reboot_chart(MK, event):                   #   Записать инфо о перезагрузке в таблицу
     cursor.execute("SELECT * from reboot")
     rows = cursor.fetchall()
     last_line = cursor.rowcount
     r_id = last_line + 1
-    event = "Reboot of MK"
+    #event = "Reboot of MK"
     cursor.execute("""INSERT INTO reboot VALUES (%s,%s,%s,%s)""",(r_id, d, MK, event)) 
     cnx.commit()
 
@@ -91,11 +91,11 @@ def data_processing(in_info):                    #   Обработка инфо
         status_MK_update(status_MK, MK_number)    # Запись статуса МКг в таблицу
 
     elif in_info == b'000003000':                #   Инфо о перезагрузке МКп
-        ser.write(b'c')
-        ser.write(b'030')
+        #ser.write(b'c')
+        #ser.write(b'030')
         logs(text_info, d, 'Перезагрузка МКп')
         MK = 'MKp'
-        info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
+        info_for_reboot_chart(MK, 'Reboot of MK')                #   Записать инфу в таблицу reboot
         status_MK = 1
         MK_number = 3
         status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу status_mk
@@ -106,14 +106,15 @@ def data_processing(in_info):                    #   Обработка инфо
         logs(text_info, d, 'Потеря связи с МКп')
         event = "MKp turned off"
         MK = 'MKp'
-        info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
+        info_for_reboot_chart(MK, 'MK shutdown')                #   Записать инфу в таблицу reboot
         status_MK = 0
         MK_number = 3
-        status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу status_mk
+        status_MK_update(status_MK, MK_number)    #   Запись статуса МКп в таблицу status_mk
 
-
- 
-
+    elif in_info == b'000003003':                 #   Отключение таймера повтора ?
+        ser.write(b'c')
+        ser.write(b'033')
+        #logs(text_info, d, 'Потеря связи с МКп')
 
 
 
@@ -173,7 +174,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000003002'
+text_info = b'000003000'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
@@ -271,7 +272,7 @@ if int(rb1) == 0:                              #   Сигнал выключен
       cnx.commit()
 
 if int(rb1) == 0:
-   if int(rb2) == 3 and int(rb3) == 3:
+   if int(rb2) == 3 and int(rb3) == 30:
       ser.write(b'c')
       ser.write(b'033')
       LogON = 1
