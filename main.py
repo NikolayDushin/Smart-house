@@ -73,7 +73,7 @@ def plintus(status_plintus):
         cursor.execute("""INSERT INTO plintus VALUES (%s,%s,%s)""",(p_id, d, status_plintus)) 
         cnx.commit()
 
-def taps(taps_status):
+def taps_p(taps_status):
     cursor.execute("SELECT * from taps_p")
     rows = cursor.fetchall()
     last_line = cursor.rowcount
@@ -83,6 +83,26 @@ def taps(taps_status):
         p_id = last_line + 1
         cursor.execute("""INSERT INTO taps_p VALUES (%s,%s,%s)""",(p_id, d, taps_status))
         cnx.commit() 
+
+def taps_t(taps_status):
+    cursor.execute("SELECT * from taps_wc")
+    rows = cursor.fetchall()
+    last_line = cursor.rowcount
+    cursor.execute("SELECT taps_wc_status from taps_wc WHERE p_id = %s"%(last_line))
+    result = cursor.fetchone()
+    if result != taps_status:
+        p_id = last_line + 1
+        cursor.execute("""INSERT INTO taps_wc VALUES (%s,%s,%s)""",(p_id, d, 0))
+        cnx.commit() 
+
+
+
+
+
+
+
+
+
 
 
 
@@ -154,25 +174,23 @@ def data_processing(in_info):                    #   Обработка инфо
         logs(text_info, d, 'Выключение плинтуса по таймеру')
         plintus(0)
 
-
-
     elif in_info == b'000003007':                 #   Сигнал выключения воды кнопкой или через сайт
         #ser.write(b'c')
         #ser.write(b'037')
         logs(text_info, d, 'Выключение воды по кнопкой или через сайт')
-        taps(0)
+        taps_p(0)
 
     elif in_info == b'000003008':                 #   Сигнал включения воды кнопкой или через сайт
         #ser.write(b'c')
         #ser.write(b'038')
         logs(text_info, d, 'Включение воды по кнопкой или через сайт')
-        taps(1)
+        taps_p(1)
 
     elif in_info == b'000003009':                 #   Выключение воды, сработал датчик
         #ser.write(b'c')
         #ser.write(b'039')
         logs(text_info, d, 'Выключение воды, сработал датчик')
-        taps(0)
+        taps_p(0)
 
     elif in_info == b'000004000':                #   Инфо о перезагрузке МКт     
         ser.write(b'c')
@@ -184,10 +202,6 @@ def data_processing(in_info):                    #   Обработка инфо
         MK_number = 4
         status_MK_update(status_MK, MK_number)   # Запись статуса МКт в таблицу
 
-
-
-
-
     elif in_info == b'000004002':                #   Потеря связи с МКт 
         #ser.write(b'c')
         #ser.write('042')
@@ -198,24 +212,38 @@ def data_processing(in_info):                    #   Обработка инфо
         MK_number = 4
         status_MK_update(status_MK, MK_number)   # Запись статуса МКт в таблицу
 
+    elif in_info == b'000004005':                #   Сигнал от датчика 1 Кухня, МКт
+        #ser.write(b'c')
+        #ser.write(b'145')
+        logs(text_info, d, 'Сигнал от датчика 1 Кухня, МКт')
+        taps_t(0)
+        Sensor1_wc = """UPDATE `detectors_wc` SET d1 = %s WHERE p_id = %s"""
+        datas = (1, 1)    
+        cursor.execute(Sensor1_wc,datas)
+        cnx.commit()
+
+    elif in_info == b'000004006':                #   Сигнал от датчика 1 Ниша, МКт
+        #ser.write(b'c')
+        #ser.write(b'146')
+        logs(text_info, d, 'Сигнал от датчика 1 Ниша, МКт')
+        taps_t(0)
+        Sensor2_wc = """UPDATE `detectors_wc` SET d2 = %s WHERE p_id = %s"""
+        datas = (1, 1)    
+        cursor.execute(Sensor2_wc,datas)
+        cnx.commit()
+
+    elif in_info == b'000004007':                #   Сигнал от датчика 3 МКт Туалет
+        #ser.write(b'c')
+        #ser.write(b'147')
+        logs(text_info, d, 'Сигнал от датчика 1 Туалет, МКт')
+        taps_t(0)
+        Sensor3_wc = """UPDATE `detectors_wc` SET d3 = %s WHERE p_id = %s"""
+        datas = (1, 1)    
+        cursor.execute(Sensor3_wc,datas)
+        cnx.commit()
 
 
 
-
-      #cursor.execute("SELECT * from reboot")
-      #rows = cursor.fetchall()
-      #last_line = cursor.rowcount
-      #r_id = last_line + 1
-
-      #event = "Device turned off"
-      #MK = 4
-      #cursor.execute("""INSERT INTO reboot VALUES (%s,%s,%s,%s)""",(r_id, d, MK, event)) 
-      #cnx.commit()
-
-      #Status_MKt = """UPDATE `status_mk` SET w_s=%s WHERE w_s_id=%s"""
-      #datas = (0, 4)    
-      #cursor.execute(Status_MKt,datas)
-      #cnx.commit()
 
 
 
@@ -257,7 +285,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000004000'
+text_info = b'000004007'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
@@ -504,7 +532,7 @@ if int(rb1) == 0:                                     #   Сигнал выкл�
       cnx.commit()
 
 if int(rb1) == 1:                                    #   Сигнал от датчика 1 МКт КУХНЯ
-   if int(rb2) == 4 and int(rb3) == 5:
+   if int(rb2) == 4 and int(rb3) == 50:
       ser.write(b'c')
       ser.write(b'145')
       LogON = 1
@@ -531,7 +559,7 @@ if int(rb1) == 1:                                    #   Сигнал от да�
       cnx.commit()
 
 if int(rb1) == 1:                                  #   Сигнал от датчика 2 МКт НИША
-   if int(rb2) == 4 and int(rb3) == 6:
+   if int(rb2) == 4 and int(rb3) == 60:
       ser.write(b'c')
       ser.write(b'146')
       LogON = 1
