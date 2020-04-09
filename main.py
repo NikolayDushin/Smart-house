@@ -168,26 +168,55 @@ def data_processing(in_info):                    #   Обработка инфо
         logs(text_info, d, 'Включение воды по кнопкой или через сайт')
         taps(1)
 
-
-
-
-
-
-
-
-
-
-
+    elif in_info == b'000003009':                 #   Выключение воды, сработал датчик
+        #ser.write(b'c')
+        #ser.write(b'039')
+        logs(text_info, d, 'Выключение воды, сработал датчик')
+        taps(0)
 
     elif in_info == b'000004000':                #   Инфо о перезагрузке МКт     
         ser.write(b'c')
         ser.write(b'040')
         logs(text_info, d, 'Перезагрузка МКт')
         MK = 'MKt'
-        info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
+        info_for_reboot_chart(MK, 'Reboot of MK')                #   Записать инфу в таблицу reboot
         status_MK = 1
         MK_number = 4
-        status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу
+        status_MK_update(status_MK, MK_number)   # Запись статуса МКт в таблицу
+
+
+
+
+
+    elif in_info == b'000004002':                #   Потеря связи с МКт 
+        #ser.write(b'c')
+        #ser.write('042')
+        logs(text_info, d, 'Потеря связи с МКт')
+        MK = 'MKt'
+        info_for_reboot_chart(MK, 'MK shutdown')                #   Записать инфу в таблицу reboot
+        status_MK = 0
+        MK_number = 4
+        status_MK_update(status_MK, MK_number)   # Запись статуса МКт в таблицу
+
+
+
+
+
+      #cursor.execute("SELECT * from reboot")
+      #rows = cursor.fetchall()
+      #last_line = cursor.rowcount
+      #r_id = last_line + 1
+
+      #event = "Device turned off"
+      #MK = 4
+      #cursor.execute("""INSERT INTO reboot VALUES (%s,%s,%s,%s)""",(r_id, d, MK, event)) 
+      #cnx.commit()
+
+      #Status_MKt = """UPDATE `status_mk` SET w_s=%s WHERE w_s_id=%s"""
+      #datas = (0, 4)    
+      #cursor.execute(Status_MKt,datas)
+      #cnx.commit()
+
 
 
 
@@ -228,7 +257,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000003007'
+text_info = b'000004000'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
@@ -405,7 +434,7 @@ if int(rb1) == 0:                               #   Сигнал выключе�
               cnx.commit()
 
 if int(rb1) == 0:                                 #   Сигнал выключения воды на МКп
-   if int(rb2) == 3 and int(rb3) == 9:
+   if int(rb2) == 3 and int(rb3) == 90:
       ser.write(b'c')
       ser.write(b'039')
       LogON = 1
@@ -454,7 +483,7 @@ if int(rb1) == 0:                                      #   Перезагруз�
 
 
 if int(rb1) == 0:                                     #   Сигнал выключения МКт
-   if int(rb2) == 4 and int(rb3) == 2:
+   if int(rb2) == 4 and int(rb3) == 20:
       ser.write(b'c')
       ser.write('042')
       LogON = 1
