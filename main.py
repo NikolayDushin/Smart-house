@@ -73,6 +73,20 @@ def plintus(status_plintus):
         cursor.execute("""INSERT INTO plintus VALUES (%s,%s,%s)""",(p_id, d, status_plintus)) 
         cnx.commit()
 
+def taps(taps_status):
+    cursor.execute("SELECT * from taps_p")
+    rows = cursor.fetchall()
+    last_line = cursor.rowcount
+    cursor.execute("SELECT taps_p_status from taps_p WHERE p_id = %s"%(last_line))
+    result = cursor.fetchone()
+    if result != taps_status:
+        p_id = last_line + 1
+        cursor.execute("""INSERT INTO taps_p VALUES (%s,%s,%s)""",(p_id, d, taps_status))
+        cnx.commit() 
+
+
+
+
 
 def data_processing(in_info):                    #   Обработка информации от МК     
 
@@ -134,11 +148,33 @@ def data_processing(in_info):                    #   Обработка инфо
         logs(text_info, d, 'Включение плинтуса')
         plintus(1)
 
-    elif in_info == b'000003006':                 #   Сигнал выключения плинтуса
+    elif in_info == b'000003006':                 #   Сигнал выключения плинтуса по таймеру
         #ser.write(b'c')
         #ser.write('036')
-        logs(text_info, d, 'Выключение плинтуса')
+        logs(text_info, d, 'Выключение плинтуса по таймеру')
         plintus(0)
+
+
+
+    elif in_info == b'000003007':                 #   Сигнал выключения воды кнопкой или через сайт
+        #ser.write(b'c')
+        #ser.write(b'037')
+        logs(text_info, d, 'Выключение воды по кнопкой или через сайт')
+        taps(0)
+
+    elif in_info == b'000003008':                 #   Сигнал включения воды кнопкой или через сайт
+        #ser.write(b'c')
+        #ser.write(b'038')
+        logs(text_info, d, 'Включение воды по кнопкой или через сайт')
+        taps(1)
+
+
+
+
+
+
+
+
 
 
 
@@ -192,7 +228,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000003006'
+text_info = b'000003007'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
@@ -326,7 +362,7 @@ if int(rb1) == 0:                               #   Сигнал выключе�
          cnx.commit()
 
 
-   if int(rb2) == 3 and int(rb3) == 7:                  #   Сигнал выключения воды на МКп
+   if int(rb2) == 3 and int(rb3) == 70:                  #   Сигнал выключения воды на МКп
       ser.write(b'c')
       ser.write(b'037')
       LogON = 1
@@ -347,7 +383,7 @@ if int(rb1) == 0:                               #   Сигнал выключе�
               cursor.execute("""INSERT INTO taps_p VALUES (%s,%s,%s)""",(p_id, d, 0)) 
               cnx.commit()
 
-   if int(rb2) == 3 and int(rb3) == 8:                 #   Сигнал включения воды на МКп
+   if int(rb2) == 3 and int(rb3) == 80:                 #   Сигнал включения воды на МКп
       ser.write(b'c')
       ser.write(b'038')
       LogON = 1
