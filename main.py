@@ -92,7 +92,7 @@ def taps_t(taps_status):
     result = cursor.fetchone()
     if result != taps_status:
         p_id = last_line + 1
-        cursor.execute("""INSERT INTO taps_wc VALUES (%s,%s,%s)""",(p_id, d, 0))
+        cursor.execute("""INSERT INTO taps_wc VALUES (%s,%s,%s)""",(p_id, d, taps_status))
         cnx.commit() 
 
 
@@ -242,12 +242,32 @@ def data_processing(in_info):                    #   Обработка инфо
         cursor.execute(Sensor3_wc,datas)
         cnx.commit()
 
+    elif in_info == b'000004008':                #   Сигнал от кнопки включения воды на МКт
+        #ser.write(b'c')
+        #ser.write(b'148')
+        logs(text_info, d, 'Сигнал от кнопки включения воды на МКт, МКт')
+        taps_t(1)
+        Sensor1_wc = """UPDATE `detectors_wc` SET d1 = %s WHERE p_id = %s"""
+        datas = (0, 1)    
+        cursor.execute(Sensor1_wc,datas)
+        cnx.commit()
+        Sensor2_wc = """UPDATE `detectors_wc` SET d2 = %s WHERE p_id = %s"""
+        datas = (0, 1)    
+        cursor.execute(Sensor2_wc,datas)
+        cnx.commit()
+        Sensor3_wc = """UPDATE `detectors_wc` SET d3 = %s WHERE p_id = %s"""
+        datas = (0, 1)    
+        cursor.execute(Sensor3_wc,datas)
+        cnx.commit()
 
 
 
 
-
-
+    elif in_info == b'000004009':                #   Сигнал от кнопки выключения воды на МКт
+        #ser.write(b'c')
+        #ser.write(b'149')
+        logs(text_info, d, 'Сигнал от кнопки выключения воды на МКт, МКт')
+        taps_t(0)
 
 
 
@@ -285,7 +305,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000004007'
+text_info = b'000004008'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
@@ -587,7 +607,7 @@ if int(rb1) == 1:                                  #   Сигнал от дат�
 
 
 if int(rb1) == 1:                                      #   Сигнал от датчика 3 МКт Туалет
-   if int(rb2) == 4 and int(rb3) == 7:
+   if int(rb2) == 4 and int(rb3) == 70:
       ser.write(b'c')
       ser.write(b'147')
       LogON = 1
@@ -613,7 +633,7 @@ if int(rb1) == 1:                                      #   Сигнал от д�
       cursor.execute(Sensor3_wc,datas)
       cnx.commit()
 
-   if int(rb2) == 4 and int(rb3) == 8:                      #   Сигнал от кнопки включения воды на МКт
+   if int(rb2) == 4 and int(rb3) == 80:                      #   Сигнал от кнопки включения воды на МКт
       ser.write(b'c')
       ser.write(b'148')
       LogON = 1
