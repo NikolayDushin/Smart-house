@@ -95,17 +95,7 @@ def taps_t(taps_status):
         cursor.execute("""INSERT INTO taps_wc VALUES (%s,%s,%s)""",(p_id, d, taps_status))
         cnx.commit() 
 
-
-
-
-
-
-
-
-
-
-
-
+###################################    Processing
 
 
 def data_processing(in_info):                    #   Обработка информации от МК     
@@ -115,12 +105,13 @@ def data_processing(in_info):                    #   Обработка инфо
     if in_info == b'000000000':
         ser.close()
         exit() 
+
     elif in_info == b'000001000':                #   Инфо о перезагрузке МКк
         ser.write(b'c')                          #   Отключение цикла опроса на МКк
         ser.write(b'010')
         logs(text_info, d, 'Перезагрузка МКк')                       #   Записать логи
         MK = 'MKk'                                       
-        info_for_reboot_chart(MK)                #   Записать инфу в таблицу reboot
+        info_for_reboot_chart(MK, 'Reboot of MK')                #   Записать инфу в таблицу reboot
         ser.write(b'D')
         ser.write(d1.encode("utf-8"))
         status_MK = 1
@@ -137,8 +128,8 @@ def data_processing(in_info):                    #   Обработка инфо
         status_MK_update(status_MK, MK_number)    # Запись статуса МКг в таблицу
 
     elif in_info == b'000003000':                #   Инфо о перезагрузке МКп
-        #ser.write(b'c')
-        #ser.write(b'030')
+        ser.write(b'c')
+        ser.write(b'030')
         logs(text_info, d, 'Перезагрузка МКп')
         MK = 'MKp'
         info_for_reboot_chart(MK, 'Reboot of MK')                #   Записать инфу в таблицу reboot
@@ -147,8 +138,8 @@ def data_processing(in_info):                    #   Обработка инфо
         status_MK_update(status_MK, MK_number)    # Запись статуса МКп в таблицу status_mk
 
     elif in_info == b'000003002':                #   Потеря связи с МКп
-        #ser.write(b'c')
-        #ser.write(b'032')
+        ser.write(b'c')
+        ser.write(b'032')
         logs(text_info, d, 'Потеря связи с МКп')
         event = "MKp turned off"
         MK = 'MKp'
@@ -163,32 +154,32 @@ def data_processing(in_info):                    #   Обработка инфо
         #logs(text_info, d, 'Потеря связи с МКп')
 
     elif in_info == b'000003005':                 #   Сигнал включения плинтуса
-        #ser.write(b'c')
-        #ser.write('035')
+        ser.write(b'c')
+        ser.write('035')
         logs(text_info, d, 'Включение плинтуса')
         plintus(1)
 
     elif in_info == b'000003006':                 #   Сигнал выключения плинтуса по таймеру
-        #ser.write(b'c')
-        #ser.write('036')
+        ser.write(b'c')
+        ser.write('036')
         logs(text_info, d, 'Выключение плинтуса по таймеру')
         plintus(0)
 
     elif in_info == b'000003007':                 #   Сигнал выключения воды кнопкой или через сайт
-        #ser.write(b'c')
-        #ser.write(b'037')
+        ser.write(b'c')
+        ser.write(b'037')
         logs(text_info, d, 'Выключение воды по кнопкой или через сайт')
         taps_p(0)
 
     elif in_info == b'000003008':                 #   Сигнал включения воды кнопкой или через сайт
-        #ser.write(b'c')
-        #ser.write(b'038')
+        ser.write(b'c')
+        ser.write(b'038')
         logs(text_info, d, 'Включение воды по кнопкой или через сайт')
         taps_p(1)
 
     elif in_info == b'000003009':                 #   Выключение воды, сработал датчик
-        #ser.write(b'c')
-        #ser.write(b'039')
+        ser.write(b'c')
+        ser.write(b'039')
         logs(text_info, d, 'Выключение воды, сработал датчик')
         taps_p(0)
 
@@ -203,8 +194,8 @@ def data_processing(in_info):                    #   Обработка инфо
         status_MK_update(status_MK, MK_number)   # Запись статуса МКт в таблицу
 
     elif in_info == b'000004002':                #   Потеря связи с МКт 
-        #ser.write(b'c')
-        #ser.write('042')
+        ser.write(b'c')
+        ser.write('042')
         logs(text_info, d, 'Потеря связи с МКт')
         MK = 'MKt'
         info_for_reboot_chart(MK, 'MK shutdown')                #   Записать инфу в таблицу reboot
@@ -213,8 +204,8 @@ def data_processing(in_info):                    #   Обработка инфо
         status_MK_update(status_MK, MK_number)   # Запись статуса МКт в таблицу
 
     elif in_info == b'000004005':                #   Сигнал от датчика 1 Кухня, МКт
-        #ser.write(b'c')
-        #ser.write(b'145')
+        ser.write(b'c')
+        ser.write(b'145')
         logs(text_info, d, 'Сигнал от датчика 1 Кухня, МКт')
         taps_t(0)
         Sensor1_wc = """UPDATE `detectors_wc` SET d1 = %s WHERE p_id = %s"""
@@ -223,8 +214,8 @@ def data_processing(in_info):                    #   Обработка инфо
         cnx.commit()
 
     elif in_info == b'000004006':                #   Сигнал от датчика 1 Ниша, МКт
-        #ser.write(b'c')
-        #ser.write(b'146')
+        ser.write(b'c')
+        ser.write(b'146')
         logs(text_info, d, 'Сигнал от датчика 1 Ниша, МКт')
         taps_t(0)
         Sensor2_wc = """UPDATE `detectors_wc` SET d2 = %s WHERE p_id = %s"""
@@ -233,8 +224,8 @@ def data_processing(in_info):                    #   Обработка инфо
         cnx.commit()
 
     elif in_info == b'000004007':                #   Сигнал от датчика 3 МКт Туалет
-        #ser.write(b'c')
-        #ser.write(b'147')
+        ser.write(b'c')
+        ser.write(b'147')
         logs(text_info, d, 'Сигнал от датчика 1 Туалет, МКт')
         taps_t(0)
         Sensor3_wc = """UPDATE `detectors_wc` SET d3 = %s WHERE p_id = %s"""
@@ -243,8 +234,8 @@ def data_processing(in_info):                    #   Обработка инфо
         cnx.commit()
 
     elif in_info == b'000004008':                #   Сигнал от кнопки включения воды на МКт
-        #ser.write(b'c')
-        #ser.write(b'148')
+        ser.write(b'c')
+        ser.write(b'148')
         logs(text_info, d, 'Сигнал от кнопки включения воды на МКт, МКт')
         taps_t(1)
         Sensor1_wc = """UPDATE `detectors_wc` SET d1 = %s WHERE p_id = %s"""
@@ -260,18 +251,11 @@ def data_processing(in_info):                    #   Обработка инфо
         cursor.execute(Sensor3_wc,datas)
         cnx.commit()
 
-
-
-
     elif in_info == b'000004009':                #   Сигнал от кнопки выключения воды на МКт
-        #ser.write(b'c')
-        #ser.write(b'149')
+        ser.write(b'c')
+        ser.write(b'149')
         logs(text_info, d, 'Сигнал от кнопки выключения воды на МКт, МКт')
         taps_t(0)
-
-
-
-
 
 
 #############################   Main
@@ -305,9 +289,25 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-text_info = b'000004008'
+#text_info = b'000001000'
 
 data_processing(text_info)                     #   Обработать входящую информацию
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -669,7 +669,7 @@ if int(rb1) == 1:                                      #   Сигнал от д�
       cursor.execute(Sensor3_wc,datas)
       cnx.commit()
 
-   if int(rb2) == 4 and int(rb3) == 9:                          #   Сигнал от кнопки выключения воды на МКт
+   if int(rb2) == 4 and int(rb3) == 90:                          #   Сигнал от кнопки выключения воды на МКт
       ser.write(b'c')
       ser.write(b'149')
       LogON = 1
