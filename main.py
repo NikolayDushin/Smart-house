@@ -68,7 +68,7 @@ def plintus(status_plintus):
     last_line = cursor.rowcount
     cursor.execute("SELECT p_status from plintus WHERE p_id = %s"%(last_line))
     result = cursor.fetchone() 
-    if result[0] == "1":
+    if result[0] != status_plintus:
         p_id = last_line + 1      
         cursor.execute("""INSERT INTO plintus VALUES (%s,%s,%s)""",(p_id, d, status_plintus)) 
         cnx.commit()
@@ -155,13 +155,13 @@ def data_processing(in_info):                    #   Обработка инфо
 
     elif in_info == b'000003005':                 #   Сигнал включения плинтуса
         ser.write(b'c')
-        ser.write('035')
+        ser.write(b'035')
         logs(text_info, d, 'Включение плинтуса')
         plintus(1)
 
     elif in_info == b'000003006':                 #   Сигнал выключения плинтуса по таймеру
         ser.write(b'c')
-        ser.write('036')
+        ser.write(b'036')
         logs(text_info, d, 'Выключение плинтуса по таймеру')
         plintus(0)
 
@@ -195,7 +195,7 @@ def data_processing(in_info):                    #   Обработка инфо
 
     elif in_info == b'000004002':                #   Потеря связи с МКт 
         ser.write(b'c')
-        ser.write('042')
+        ser.write(b'042')
         logs(text_info, d, 'Потеря связи с МКт')
         MK = 'MKt'
         info_for_reboot_chart(MK, 'MK shutdown')                #   Записать инфу в таблицу reboot
@@ -266,7 +266,7 @@ try:
     rb1 = ser.read(3)
     rb2 = ser.read(3)
     rb3 = ser.read(3)
-    text_info = rb1 + rb2 + rb1
+    text_info = rb1 + rb2 + rb3
     print ("G status:",  rb1)
     print ("G status:",  rb2)
     print ("G status:",  rb3)
@@ -289,7 +289,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-#text_info = b'000001000'
+#text_info = b'000003005'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
