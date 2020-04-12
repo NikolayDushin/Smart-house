@@ -68,31 +68,31 @@ def plintus(status_plintus):
     last_line = cursor.rowcount
     cursor.execute("SELECT p_status from plintus WHERE p_id = %s"%(last_line))
     result = cursor.fetchone() 
-    if result[0] != status_plintus:
+    if int(result[0]) != status_plintus:
         p_id = last_line + 1      
         cursor.execute("""INSERT INTO plintus VALUES (%s,%s,%s)""",(p_id, d, status_plintus)) 
         cnx.commit()
 
-def taps_p(taps_status):
+def taps_p(taps_status_p):
     cursor.execute("SELECT * from taps_p")
     rows = cursor.fetchall()
     last_line = cursor.rowcount
     cursor.execute("SELECT taps_p_status from taps_p WHERE p_id = %s"%(last_line))
     result = cursor.fetchone()
-    if result != taps_status:
+    if int(result[0]) != taps_status_p:
         p_id = last_line + 1
-        cursor.execute("""INSERT INTO taps_p VALUES (%s,%s,%s)""",(p_id, d, taps_status))
+        cursor.execute("""INSERT INTO taps_p VALUES (%s,%s,%s)""",(p_id, d, taps_status_p))
         cnx.commit() 
 
-def taps_t(taps_status):
+def taps_t(taps_status_t):
     cursor.execute("SELECT * from taps_wc")
     rows = cursor.fetchall()
     last_line = cursor.rowcount
     cursor.execute("SELECT taps_wc_status from taps_wc WHERE p_id = %s"%(last_line))
     result = cursor.fetchone()
-    if result != taps_status:
+    if int(result[0]) != taps_status_t:
         p_id = last_line + 1
-        cursor.execute("""INSERT INTO taps_wc VALUES (%s,%s,%s)""",(p_id, d, taps_status))
+        cursor.execute("""INSERT INTO taps_wc VALUES (%s,%s,%s)""",(p_id, d, taps_status_t))
         cnx.commit() 
 
 ###################################    Processing
@@ -165,16 +165,16 @@ def data_processing(in_info):                    #   Обработка инфо
         logs(text_info, d, 'Выключение плинтуса по таймеру')
         plintus(0)
 
-    elif in_info == b'000003007':                 #   Сигнал выключения воды кнопкой или через сайт
-        ser.write(b'c')
-        ser.write(b'037')
-        logs(text_info, d, 'Выключение воды по кнопкой или через сайт')
+    elif in_info == b'000003007':                 #   Сигнал выключения
+        #ser.write(b'c')
+        #ser.write(b'037')
+        logs(text_info, d, 'Выключение воды')
         taps_p(0)
 
-    elif in_info == b'000003008':                 #   Сигнал включения воды кнопкой или через сайт
-        ser.write(b'c')
-        ser.write(b'038')
-        logs(text_info, d, 'Включение воды по кнопкой или через сайт')
+    elif in_info == b'000003008':                 #   Сигнал включения воды
+        #ser.write(b'c')
+        #ser.write(b'038')
+        logs(text_info, d, 'Включение воды')
         taps_p(1)
 
     elif in_info == b'000003009':                 #   Выключение воды, сработал датчик
@@ -289,7 +289,7 @@ d1 = current_time.strftime("%S%M%H%d%m%y%w")
 d = current_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
-#text_info = b'000003005'
+#text_info = b'000003008'
 
 data_processing(text_info)                     #   Обработать входящую информацию
 
