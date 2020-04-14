@@ -203,7 +203,7 @@ def data_processing(in_info):                    #   Обработка инфо
         MK_number = 4
         status_MK_update(status_MK, MK_number)   # Запись статуса МКт в таблицу
 
-    elif in_info == b'000004005':                #   Сигнал от датчика 1 Кухня, МКт
+    elif in_info == b'001004005':                #   Сигнал от датчика 1 Кухня, МКт
         ser.write(b'c')
         ser.write(b'145')
         logs(text_info, d, 'Сигнал от датчика 1 Кухня, МКт')
@@ -213,7 +213,7 @@ def data_processing(in_info):                    #   Обработка инфо
         cursor.execute(Sensor1_wc,datas)
         cnx.commit()
 
-    elif in_info == b'000004006':                #   Сигнал от датчика 1 Ниша, МКт
+    elif in_info == b'001004006':                #   Сигнал от датчика 1 Ниша, МКт
         ser.write(b'c')
         ser.write(b'146')
         logs(text_info, d, 'Сигнал от датчика 1 Ниша, МКт')
@@ -223,7 +223,7 @@ def data_processing(in_info):                    #   Обработка инфо
         cursor.execute(Sensor2_wc,datas)
         cnx.commit()
 
-    elif in_info == b'000004007':                #   Сигнал от датчика 3 МКт Туалет
+    elif in_info == b'001004007':                #   Сигнал от датчика 3 МКт Туалет
         ser.write(b'c')
         ser.write(b'147')
         logs(text_info, d, 'Сигнал от датчика 1 Туалет, МКт')
@@ -233,7 +233,7 @@ def data_processing(in_info):                    #   Обработка инфо
         cursor.execute(Sensor3_wc,datas)
         cnx.commit()
 
-    elif in_info == b'000004008':                #   Сигнал от кнопки включения воды на МКт
+    elif in_info == b'001004008':                #   Сигнал от кнопки включения воды на МКт
         ser.write(b'c')
         ser.write(b'148')
         logs(text_info, d, 'Сигнал от кнопки включения воды на МКт, МКт')
@@ -251,7 +251,7 @@ def data_processing(in_info):                    #   Обработка инфо
         cursor.execute(Sensor3_wc,datas)
         cnx.commit()
 
-    elif in_info == b'000004009':                #   Сигнал от кнопки выключения воды на МКт
+    elif in_info == b'001004009':                #   Сигнал от кнопки выключения воды на МКт
         ser.write(b'c')
         ser.write(b'149')
         logs(text_info, d, 'Сигнал от кнопки выключения воды на МКт, МКт')
