@@ -122,7 +122,7 @@ if T_dif > 10:                            # Если температура вы
     save_counter = save_counter +1 
 
     #print t1_info, T_dif, "C"
-    #print save[0] 
+    #print (save[0]) 
 
 if T_dif < -10:                           # Если температура упадет на 10 С за сутки  
     t2_info = "В течении дня ожидается падение температуры на "

@@ -20,7 +20,8 @@ data_t = []
 data_p = []
 data_o = []
 data_w = []
-save = []
+save = []                                        #   Список для публикации
+save_test = []
 save_e = []
 save_2 = []
 alarm_data = []
@@ -71,20 +72,37 @@ def receiving_data():
         data_w.append(y_w)            # Занесение данных по силе ветра в массив 
     return y_d, y_t, y_p, y_o, y_w
 
-def temperature_events():
 
 
-    T_dif = 50
-    #if T_dif > 10:                            # Если температура вырастет на 10 С за сутки 
-    #    t1_info = "В течении дня ожидается рост температуры на "
-    #    t1 = t1_info + str(T_dif) + " C"
-    #    join = [save_counter, t1]
-    #    save.append(join)
-    #    save_counter = save_counter +1 
-    #    return save
 
-    #print t1_info, T_dif, "C"
-    #print save[0] 
+def output_data(save_counter, t1):
+    join = [save_counter, t1]
+    save.append(join)
+    save_counter = save_counter + 1
+    return save_counter
+
+
+def temperature_events(save_counter):
+
+    #T_dif = -30
+
+    if T_dif > 10:                            # Если температура вырастет более чем на 10 С за сутки 
+        t1_info = "В течении дня ожидается рост температуры на "
+        t1 = t1_info + str(T_dif) + " C"
+        save_counter = output_data(save_counter, t1)
+
+     if T_dif < -10:                           # Если температура упадет более чем на 10 С за сутки
+        t2_info = "В течении дня ожидается падение температуры на "
+        t2 = t2_info + str(T_dif) + " C" 
+        save_counter = output_data(save_counter, t2)
+
+    return save_counter
+
+    
+
+
+
+     
     
 
    
@@ -103,7 +121,7 @@ results = cursor.fetchall()
 y_d, y_t, y_p, y_o, y_w =  receiving_data()      #   Разбивка данных
 
 save_counter_e = 1
-save_counter = 1
+save_counter = 1                                 #   Счетчик сообщений, которые будут опубликованы 
 
 ##### Расчет мин, макс температуры и рост / падение температуры за сутки 
     
@@ -118,7 +136,16 @@ T_dif = float(T_max) - float(T_min)
 
 ########## События, связанные с температурой ##########
 
-temperature_events()
+save_counter = temperature_events(save_counter)
+
+#temperature_events(save_counter)
+
+print(save, save_counter)
+
+
+
+
+
 
 
 
