@@ -87,22 +87,31 @@ def temperature_events(save_counter):
     #T_dif = -30
 
     if T_dif > 10:                            # Если температура вырастет более чем на 10 С за сутки 
-        t1_info = "В течении дня ожидается рост температуры на "
+        t1_info = "В течении суток ожидается рост температуры на "
         t1 = t1_info + str(T_dif) + " C"
         save_counter = output_data(save_counter, t1)
-
-     if T_dif < -10:                           # Если температура упадет более чем на 10 С за сутки
-        t2_info = "В течении дня ожидается падение температуры на "
+  
+    if T_dif < -10:                           # Если температура упадет более чем на 10 С за сутки
+        t2_info = "В течении суток ожидается падение температуры на "
         t2 = t2_info + str(T_dif) + " C" 
         save_counter = output_data(save_counter, t2)
+ 
+    if T_max > 29:                        #   Если температура за сутки превысит 30С 
+        t3_info = "В течении суток ожидается высокая температура "
+        t3 = t3_info + str(T_max) + " C"
+        print(t3)
+        save_counter = output_data(save_counter, t3)
+        print(save, save_counter)
+
+    if T_min < -20:                        #   Если температура за сутки превысит 30С 
+        t4_info = "В течении суток ожидается ожидается низкая температура "
+        t4 = t4_info + str(T_min) + " C"
+        print(t4)
+        save_counter = output_data(save_counter, t4)
+        print(save, save_counter)
 
     return save_counter
-
     
-
-
-
-     
     
 
    
@@ -118,17 +127,20 @@ cursor = cnx.cursor()
 cursor.execute("SELECT * from forecast")         #   Извлечние входящих данных из таблицы 
 results = cursor.fetchall()   
 
-y_d, y_t, y_p, y_o, y_w =  receiving_data()      #   Разбивка данных
+y_d, y_t, y_p, y_o, y_w =  receiving_data()      #   Разбивка данных 
 
 save_counter_e = 1
 save_counter = 1                                 #   Счетчик сообщений, которые будут опубликованы 
 
-##### Расчет мин, макс температуры и рост / падение температуры за сутки 
+
     
-T_min = min(data_t)
-T_max = max(data_t)
+T_min = float(min(data_t))
+T_max = float(max(data_t))
 T_dif = float(T_max) - float(T_min)
 
+#T_max = 40
+#T_min = -30
+#T_dif = 60
 
 ###################################   Анализ данных  ####################################################
 
@@ -140,7 +152,7 @@ save_counter = temperature_events(save_counter)
 
 #temperature_events(save_counter)
 
-print(save, save_counter)
+#print(save, save_counter)
 
 
 
