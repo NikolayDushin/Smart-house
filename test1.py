@@ -9,6 +9,7 @@ import datetime as dt
 join = []
 save = []
 t_j = []
+y_d = []
 
 
 def add_to_save(save_counter, t2):
@@ -61,11 +62,26 @@ def test_list(temp1, temp2):
     return t_j   
 
 
+
+
+
+def test_data():
+    #y_d = [18, 19,20]
+    print(y_d)    
+    #return y_d
+
+
+
+
+
+
+
+
 temp1 = 10
 temp2 = 20
 
 t_j = test_list(temp1, temp2)
-print(t_j[0])
+#print(t_j[0])
 
 #print(t_j[0], t_j[1])
 ###############################################################
@@ -84,6 +100,14 @@ T_dif = float(T_max) - float(T_min)
 #print(save_counter)
 
 
+y_d = [18, 19,20]
+
+
+test_data()
+
+
+
+#print(y_d)
 
 
 

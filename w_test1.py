@@ -72,15 +72,11 @@ def receiving_data():
         data_w.append(y_w)            # Занесение данных по силе ветра в массив 
     return y_d, y_t, y_p, y_o, y_w
 
-
-
-
 def output_data(save_counter, t1):
     join = [save_counter, t1]
     save.append(join)
     save_counter = save_counter + 1
     return save_counter
-
 
 def temperature_events(save_counter):
 
@@ -99,19 +95,66 @@ def temperature_events(save_counter):
     if T_max > 29:                        #   Если температура за сутки превысит 30С 
         t3_info = "В течении суток ожидается высокая температура "
         t3 = t3_info + str(T_max) + " C"
-        print(t3)
+        #print(t3)
         save_counter = output_data(save_counter, t3)
-        print(save, save_counter)
+        #print(save, save_counter)
 
     if T_min < -20:                        #   Если температура за сутки превысит 30С 
         t4_info = "В течении суток ожидается ожидается низкая температура "
         t4 = t4_info + str(T_min) + " C"
-        print(t4)
+        #print(t4)
         save_counter = output_data(save_counter, t4)
-        print(save, save_counter)
+        #print(save, save_counter)
 
     return save_counter
     
+
+
+
+def downfall():
+
+    i = 0
+    flag_min_osadki = 0
+    flag_max_osadki = 0
+    #flag_extrim_osadki = 0
+
+
+
+    for osadki_mm in data_o:                     # Поиск количества осадков более 0мм и определение времени  
+        if float(osadki_mm) > 10:                 # Убрать из списка нулевые значения
+            #print(i, data_d[i], )
+            return i 
+#        else: break
+        i=i+1
+       
+
+
+
+
+
+
+
+def downfall_events(save_counter):
+    i = downfall()
+    print(i)
+    d1 = ('Ожидаются осадки '+ str(data_d[i])[8:10] + '-го в ' + str(data_d[i])[11:16] + '. ')
+    d1 = d1 + ('Количество ' + str(data_o[i]) + ' мм.')
+    print(d1, save_counter)
+    #save_counter = output_data(save_counter, d1)
+
+
+
+
+    #return save_counter
+
+
+
+
+
+
+
+
+
     
 
    
@@ -138,61 +181,27 @@ T_min = float(min(data_t))
 T_max = float(max(data_t))
 T_dif = float(T_max) - float(T_min)
 
-#T_max = 40
-#T_min = -30
-#T_dif = 60
-
 ###################################   Анализ данных  ####################################################
 
-#flag = 0  # Флаг для подсчета количества строк
-
-########## События, связанные с температурой ##########
-
-save_counter = temperature_events(save_counter)
-
-#temperature_events(save_counter)
-
-#print(save, save_counter)
+save_counter = temperature_events(save_counter)  #   Проверка событий, связанных с температурой 
 
 
 
 
 
+downfall_events(save_counter)
+
+
+#save_counter = downfall_events(save_counter)
 
 
 
-#if T_dif > 10:                            # Если температура вырастет на 10 С за сутки 
-#    t1_info = "В течении дня ожидается рост температуры на "
-#    t1 = t1_info + str(T_dif) + " C"
-#    join = [save_counter, t1]
-#    save.append(join)
-#    save_counter = save_counter +1 
-#    print(save[0])
 
-    #print t1_info, T_dif, "C"
-    #print save[0] 
 
-#if T_dif < -10:                           # Если температура упадет на 10 С за сутки  
-#    t2_info = "В течении дня ожидается падение температуры на "
-#    t2 = t2_info + str(T_dif) + " C" 
-#    join = [save_counter, t2]
-#    save.append(join)
-#    save_counter = save_counter +1
 
-#if float(T_max) > 29:                            # Если температура превысит 30С 
-#    #print T_max
-#    t1_info = "Ожидается высокая температура "
-#    t1 = t1_info + str(T_max) + " C"
-#    join = [save_counter, t1]
-#    save.append(join)
-#    save_counter = save_counter +1
 
-#if float(T_min) < -20:                            # Если температура ниже -21С 
-#    t1_info = "Ожидается низкая температура "
-#    t1 = t1_info + str(T_min) + " C"
-#    join = [save_counter, t1]
-#    save.append(join)
-#    save_counter = save_counter +1
+
+
 
 ########## События, связанные с осадками ##########
 
