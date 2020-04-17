@@ -67,8 +67,8 @@ def test_list(temp1, temp2):
 
 def test_data():
     #y_d = [18, 19,20]
-    print(y_d)    
-    #return y_d
+    #print(y_d)    
+    return y_d
 
 
 
@@ -100,14 +100,19 @@ T_dif = float(T_max) - float(T_min)
 #print(save_counter)
 
 
-y_d = [18, 19,20]
+y_d = ['0.1','0.1', '0.2', '0.5', '5', '7', '10']
 
 
-test_data()
+#test_data()
 
+#print(type(float(y_d[0])))
 
+test_sum = 0
+for i in y_d:
+    i = float(i)
+    test_sum = test_sum + i
 
-#print(y_d)
+print(test_sum)
 
 
 

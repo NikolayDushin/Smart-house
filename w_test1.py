@@ -69,7 +69,7 @@ def receiving_data():
         y_o = row[4]
         data_o.append(y_o)            # Занесение данных по осадкам в массив 
         y_w = row[5]
-        data_w.append(y_w)            # Занесение данных по силе ветра в массив 
+        data_w.append(y_w)            # Занесение данных по силе ветра в массив
     return y_d, y_t, y_p, y_o, y_w
 
 def output_data(save_counter, t1):
@@ -114,14 +114,14 @@ def temperature_events(save_counter):
 def downfall():
 
     i = 0
-    flag_min_osadki = 0
-    flag_max_osadki = 0
+    #flag_min_osadki = 0
+    #flag_max_osadki = 0
     #flag_extrim_osadki = 0
 
 
 
     for osadki_mm in data_o:                     # Поиск количества осадков более 0мм и определение времени  
-        if float(osadki_mm) > 10:                 # Убрать из списка нулевые значения
+        if float(osadki_mm) > 0:                 # Убрать из списка нулевые значения
             #print(i, data_d[i], )
             return i 
 #        else: break
@@ -136,7 +136,7 @@ def downfall():
 
 def downfall_events(save_counter):
     i = downfall()
-    print(i)
+    #print(i)
     d1 = ('Ожидаются осадки '+ str(data_d[i])[8:10] + '-го в ' + str(data_d[i])[11:16] + '. ')
     d1 = d1 + ('Количество ' + str(data_o[i]) + ' мм.')
     print(d1, save_counter)
@@ -176,10 +176,41 @@ save_counter_e = 1
 save_counter = 1                                 #   Счетчик сообщений, которые будут опубликованы 
 
 
+
+######################  Расчеты
     
 T_min = float(min(data_t))
 T_max = float(max(data_t))
 T_dif = float(T_max) - float(T_min)
+
+
+
+#data_o[20] = 20
+
+i = 0
+D_sum = 0
+D_strong = ''
+D_very_strong = ''
+D_start = ''
+for y in data_o:
+    y = float(y)
+    D_sum = D_sum + y                            #   Вычисление общего количества осадков за сутки
+    if y > 10 and D_very_strong == '':    
+        D_very_strong = data_d[i]                #   Поиск времени начала очень сильных осадков
+    if y > 5 and D_strong == '':    
+        D_strong = data_d[i]                     #   Поиск времени начала сильных осадков
+    if y > 0 and D_start == '':
+        D_start = data_d[i] 
+
+    i = i + 1
+
+
+#print (D_sum)
+print (D_start)
+
+
+
+
 
 ###################################   Анализ данных  ####################################################
 
@@ -193,6 +224,9 @@ downfall_events(save_counter)
 
 
 #save_counter = downfall_events(save_counter)
+
+
+
 
 
 
