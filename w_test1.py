@@ -111,35 +111,73 @@ def temperature_events(save_counter):
 
 
 
-def downfall():
 
+
+
+
+
+
+
+def downfall_calculations():                     #   Подпрограмма расчетов, связанных с осадками
     i = 0
-    #flag_min_osadki = 0
-    #flag_max_osadki = 0
-    #flag_extrim_osadki = 0
+    D_sum = 0
+    D_strong = ''
+    D_very_strong = ''
+    D_start = ''
+    for y in data_o:
+        y = float(y)
+        D_sum = D_sum + y                            #   Вычисление общего количества осадков за сутки
+        if y > 10 and D_very_strong == '':    
+            D_very_strong = data_d[i]                #   Поиск времени начала очень сильных осадков
+        if y > 5 and D_strong == '':    
+            D_strong = data_d[i]                     #   Поиск времени начала сильных осадков
+        if y > 0 and D_start == '':
+            D_start = data_d[i] 
+        i = i + 1
+    return D_start, D_sum, D_strong, D_very_strong     
+    
 
 
 
-    for osadki_mm in data_o:                     # Поиск количества осадков более 0мм и определение времени  
-        if float(osadki_mm) > 0:                 # Убрать из списка нулевые значения
-            #print(i, data_d[i], )
-            return i 
-#        else: break
-        i=i+1
-       
 
 
 
 
 
 
+def downfall_events(save_counter, D_start, D_sum, D_strong, D_very_strong):
+    if D_start != '':                                                                              #   Если в течении суток ожидаются осадки                   
+        D1 = ('Ожидаются осадки в '+ str(D_start)[8:10] + '-го в ' + str(D_start)[11:16] + '. ')
+        D1 = D1 + (' За сутки выпадет ' + str(D_sum) + ' мм.')
+        #print(save_counter,D1)        
+        save_counter = output_data(save_counter, D1)
 
-def downfall_events(save_counter):
-    i = downfall()
+    if D_strong != '':                                                                             #   Если выпадет более 5 мм осадков
+        D2 = ('Ожидаются сильные осадки в '+ str(D_strong)[8:10] + '-го в ' + str(D_strong)[11:16] + '. ')
+        D2 = D2 + (' За сутки выпадет ' + str(D_sum) + ' мм.')
+        #print(save_counter,D2) 
+        save_counter = output_data(save_counter, D2)
+
+    if D_very_strong != '':                                                                        #   Если выпадет более 10 мм осадков
+        D3 = ('Ожидаются очень сильные осадки в '+ str(D_very_strong)[8:10] + '-го в ' + str(D_very_strong)[11:16] + '. ')
+        D3 = D3 + (' За сутки выпадет ' + str(D_sum) + ' мм.')
+        #print(save_counter,D3) 
+        save_counter = output_data(save_counter, D3)
+
+    if D_sum > 10:                                                                        #   Если выпадет более 10 мм осадков
+        D3 = ('Ожидаются очень сильные осадки. ')
+        D3 = D3 + (' За сутки выпадет ' + str(D_sum) + ' мм.')
+        #print(save_counter,D3) 
+        save_counter = output_data(save_counter, D3)
+
+
+
+
+
     #print(i)
-    d1 = ('Ожидаются осадки '+ str(data_d[i])[8:10] + '-го в ' + str(data_d[i])[11:16] + '. ')
-    d1 = d1 + ('Количество ' + str(data_o[i]) + ' мм.')
-    print(d1, save_counter)
+    #d1 = ('Ожидаются осадки '+ str(data_d[i_d])[8:10] + '-го в ' + str(data_d[i_d])[11:16] + '. ')
+    #d1 = d1 + ('Количество ' + str(data_o[i_d]) + ' мм.')
+    #print(save_counter)
     #save_counter = output_data(save_counter, d1)
 
 
@@ -185,28 +223,12 @@ T_dif = float(T_max) - float(T_min)
 
 
 
-#data_o[20] = 20
-
-i = 0
-D_sum = 0
-D_strong = ''
-D_very_strong = ''
-D_start = ''
-for y in data_o:
-    y = float(y)
-    D_sum = D_sum + y                            #   Вычисление общего количества осадков за сутки
-    if y > 10 and D_very_strong == '':    
-        D_very_strong = data_d[i]                #   Поиск времени начала очень сильных осадков
-    if y > 5 and D_strong == '':    
-        D_strong = data_d[i]                     #   Поиск времени начала сильных осадков
-    if y > 0 and D_start == '':
-        D_start = data_d[i] 
-
-    i = i + 1
+D_start, D_sum, D_strong, D_very_strong = downfall_calculations()
 
 
-#print (D_sum)
-print (D_start)
+
+
+
 
 
 
@@ -220,7 +242,7 @@ save_counter = temperature_events(save_counter)  #   Проверка событ
 
 
 
-downfall_events(save_counter)
+save_counter = downfall_events(save_counter, D_start, D_sum, D_strong, D_very_strong)
 
 
 #save_counter = downfall_events(save_counter)
@@ -257,8 +279,8 @@ for osadki_mm in data_o:      # Поиск количества осадков �
                 t1_info = "Ожидаются осадки "
                 t1 = t1_info + str(time_o_min)
                 join = [save_counter, t1]
-                save.append(join)
-                save_counter = save_counter +1 
+                #save.append(join)
+                #save_counter = save_counter +1 
 
     if float(osadki_mm) > 5:  # Поиск времени начала сильного дождя 
         if flag_max_osadki == 0: 
@@ -267,8 +289,8 @@ for osadki_mm in data_o:      # Поиск количества осадков �
             t1_info = "Ожидаются сильные осадки "
             t1 = t1_info + str(time_o_max)
             join = [save_counter, t1]
-            save.append(join)
-            save_counter = save_counter +1 
+            #save.append(join)
+            #save_counter = save_counter +1 
 
     if float(osadki_mm) > 10:  # Поиск времени начала очень сильного дождя 
         if flag_extrim_osadki == 0: 
@@ -277,8 +299,8 @@ for osadki_mm in data_o:      # Поиск количества осадков �
             t1_info = "Внимание! Опасный уровень осадков "
             t1 = t1_info + str(time_o_extreme)
             join = [save_counter_e, t1]
-            save_e.append(join)
-            save_counter_e = save_counter_e +1
+            #save_e.append(join)
+            #save_counter_e = save_counter_e +1
 
     i=i+1
 
@@ -293,24 +315,24 @@ if p_min < 740:               # Определение низкого давле
     p1_info = "В течении дня ожидается низкое давление "
     p1 = p1_info + str(p_min) + " мм рт ст"
     join = [save_counter, p1]
-    save.append(join)
-    save_counter = save_counter +1 
+    #save.append(join)
+    #save_counter = save_counter +1 
     #print p_min
 
 if p_max > 760:               # Определение высокого давления 
     p2_info = "В течении дня ожидается высокое давление "
     p2 = p2_info + str(p_max) + " мм рт ст"
     join = [save_counter, p2]
-    save.append(join)
-    save_counter = save_counter +1
+    #save.append(join)
+    #save_counter = save_counter +1
     #print p_max
 
 if p_dif > 5:               # Определение изменения давления за сутки более 5мм 
     p2_info = "Ожидается изменение давления более "
     p2 = p2_info + str(p_dif) + " мм рт ст"
     join = [save_counter, p2]
-    save.append(join)
-    save_counter = save_counter +1
+    #save.append(join)
+    #save_counter = save_counter +1
 
 #print p_min
 #print p_max
@@ -334,8 +356,8 @@ for wind in data_w:      # Поиск силы ветра более 5 м/с и 
                 t1_info = "Ожидается сильный ветер "
                 t1 = t1_info + str(time_w)
                 join = [save_counter, t1]
-                save.append(join)
-                save_counter = save_counter +1
+                #save.append(join)
+                #save_counter = save_counter +1
     i=i+1
 
 
@@ -352,8 +374,8 @@ for wind in data_w:      # Поиск силы ветра более 10м/c и �
             t1_info = "Ожидается очень сильный ветер "
             t1 = t1_info + str(time_w)
             join = [save_counter, t1]
-            save.append(join)
-            save_counter = save_counter +1
+            #save.append(join)
+            #save_counter = save_counter +1
     i=i+1
 
 i = 0
@@ -368,8 +390,8 @@ for wind in data_w:      # Поиск силы ветра более 15м/c и �
             t1_info = "Внимание! Опасный штормовой ветер "
             t1 = t1_info + str(time_w_extreme)
             join = [save_counter_e, t1]
-            save_e.append(join)
-            save_counter_e = save_counter_e +1
+            #save_e.append(join)
+            #save_counter_e = save_counter_e +1
     i=i+1
 
 ################################### Занесение информации в таблицу weather_alarm  #####################################
