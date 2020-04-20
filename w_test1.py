@@ -181,6 +181,35 @@ def downfall_events(save_counter, save_counter_e, D_start, D_sum, D_strong, D_ve
 
 
 
+def pressure_events(save_counter, P_min, P_max, P_dif):
+
+    P_dif = 10
+
+    if P_min < 740:                               # Определение низкого давления, 740 мм
+        p1_info = "В течении дня ожидается низкое давление "
+        p1 = p1_info + str(P_min) + " мм. рт. ст."
+        save_counter = output_data(save_counter, p1)
+        #print(save_counter, p1)
+
+
+    if P_max > 760:               # Определение высокого давления, более 760 мм
+        p2_info = "В течении дня ожидается высокое давление "
+        p2 = p2_info + str(P_max) + " мм. рт. ст."
+        save_counter = output_data(save_counter, p2)
+        #print(save_counter, p2)
+
+
+    if P_dif > 5:               # Определение изменения давления за сутки более 5мм 
+        p3_info = "Ожидается изменение давления более "
+        p3 = p3_info + str(P_dif) + " мм. рт. ст."
+        save_counter = output_data(save_counter, p3)
+        #print(save_counter, p3)
+
+
+
+
+
+
 
     
 
@@ -216,6 +245,9 @@ D_start, D_sum, D_strong, D_very_strong = downfall_calculations()
 D_sum = round(D_sum,1)                                                                             #   Округление 
 
 
+P_min = float(min(data_p))   # минимальное давление за сутки
+P_max = float(max(data_p))   # максимальное давление за сутки
+P_dif = P_max - P_min  # разница
 
 
 
@@ -231,7 +263,7 @@ save_counter, save_counter_e = temperature_events(save_counter, save_counter_e) 
 save_counter, save_counter_e = downfall_events(save_counter, save_counter_e, D_start, D_sum, D_strong, D_very_strong)
 
 
-
+pressure_events(save_counter, P_min, P_max, P_dif)
 
 
 #print(save_counter_e)
