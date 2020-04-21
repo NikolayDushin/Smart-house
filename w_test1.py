@@ -92,7 +92,7 @@ def temperature_events(save_counter, save_counter_e):
 
     #print(save_counter_e)
 
-    #T_max = 70        
+    T_max = 70        
 
     if T_dif > 10:                            # Если температура вырастет более чем на 10 С за сутки 
         t1_info = "В течении суток ожидается рост температуры на "
@@ -310,138 +310,12 @@ save_counter, save_counter_e = wind_events(save_counter, save_counter_e, D_wind_
 
 ########## События, связанные с осадками ##########
 
-i = 0
-flag_min_osadki = 0
-flag_max_osadki = 0
-flag_extrim_osadki = 0
-
-for osadki_mm in data_o:      # Поиск количества осадков более 1мм и определение времени  
-    if float(osadki_mm) > 0:  # Поиск времени начала дождя 
-        if flag_min_osadki == 0: 
-            time_o_min = str(data_d[i])[8:16]
-            time_event = time_o_min[0:8]
-            time_refresh = str(data_d[0])[8:16]
-            #print time_event
-            #print time_refresh
-            if time_refresh < time_event:            # Если время события прошло 
-                flag_min_osadki = 1
-                t1_info = "Ожидаются осадки "
-                t1 = t1_info + str(time_o_min)
-                join = [save_counter, t1]
-                #save.append(join)
-                #save_counter = save_counter +1 
-
-    if float(osadki_mm) > 5:  # Поиск времени начала сильного дождя 
-        if flag_max_osadki == 0: 
-            time_o_max = str(data_d[i])[8:16]
-            flag_max_osadki = 1
-            t1_info = "Ожидаются сильные осадки "
-            t1 = t1_info + str(time_o_max)
-            join = [save_counter, t1]
-            #save.append(join)
-            #save_counter = save_counter +1 
-
-    if float(osadki_mm) > 10:  # Поиск времени начала очень сильного дождя 
-        if flag_extrim_osadki == 0: 
-            time_o_extreme = str(data_d[i])[8:16]
-            flag_extrim_osadki = 1
-            t1_info = "Внимание! Опасный уровень осадков "
-            t1 = t1_info + str(time_o_extreme)
-            #join = [save_counter_e, t1]
-            #save_e.append(join)
-            #save_counter_e = save_counter_e +1
-
-    i=i+1
 
 ########## События, связанные с атмосферным давлением   ##########
 
-p_min = float(min(data_p))   # минимальное давление за сутки
-p_max = float(max(data_p))   # максимальное давление за сутки
-
-p_dif = p_max - p_min  # разница
-
-if p_min < 740:               # Определение низкого давления 
-    p1_info = "В течении дня ожидается низкое давление "
-    p1 = p1_info + str(p_min) + " мм рт ст"
-    join = [save_counter, p1]
-    #save.append(join)
-    #save_counter = save_counter +1 
-    #print p_min
-
-if p_max > 760:               # Определение высокого давления 
-    p2_info = "В течении дня ожидается высокое давление "
-    p2 = p2_info + str(p_max) + " мм рт ст"
-    join = [save_counter, p2]
-    #save.append(join)
-    #save_counter = save_counter +1
-    #print p_max
-
-if p_dif > 5:               # Определение изменения давления за сутки более 5мм 
-    p2_info = "Ожидается изменение давления более "
-    p2 = p2_info + str(p_dif) + " мм рт ст"
-    join = [save_counter, p2]
-    #save.append(join)
-    #save_counter = save_counter +1
-
-#print p_min
-#print p_max
-#print p_dif
 
 ########## События, связанные с ветром   ##########
 
-i = 0
-#w_max = float(max(data_w))   # максимальная сила ветра за сутки
-
-flag_max_wind = 0
-
-for wind in data_w:      # Поиск силы ветра более 5 м/с и определение времени
-    if float(wind) > 5:  # Поиск времени начала сильного ветра 
-        if flag_max_wind == 0: 
-            time_w = str(data_d[i])[8:16]
-            time_event = time_w[0:8]
-            time_refresh = str(data_d[0])[8:16]
-            if time_refresh < time_event:                   # Если время события прошло
-                flag_max_wind = 1
-                t1_info = "Ожидается сильный ветер "
-                t1 = t1_info + str(time_w)
-                join = [save_counter, t1]
-                #save.append(join)
-                #save_counter = save_counter +1
-    i=i+1
-
-
-
-i = 0
-flag_max_wind = 0
-
-for wind in data_w:      # Поиск силы ветра более 10м/c и определение времени  
-    if float(wind) > 10:  # Поиск времени начала сильного ветра 
-        if flag_max_wind == 0: 
-            time_w = str(data_d[i])[8:16]
-            #print (time_w)
-            flag_max_wind = 1
-            t1_info = "Ожидается очень сильный ветер "
-            t1 = t1_info + str(time_w)
-            #join = [save_counter, t1]
-            #save.append(join)
-            #save_counter = save_counter +1
-    i=i+1
-
-i = 0
-flag_extreme_wind = 0
-
-for wind in data_w:      # Поиск силы ветра более 15м/c и определение времени  
-    if float(wind) > 15:  # Поиск времени начала сильного ветра 
-        if flag_extreme_wind == 0: 
-            time_w_extreme = str(data_d[i])[8:16]
-            #print time_w
-            flag_extreme_wind = 1
-            t1_info = "Внимание! Опасный штормовой ветер "
-            t1 = t1_info + str(time_w_extreme)
-            #join = [save_counter_e, t1]
-            #save_e.append(join)
-            #save_counter_e = save_counter_e +1
-    i=i+1
 
 ################################### Занесение информации в таблицу weather_alarm  #####################################
 
