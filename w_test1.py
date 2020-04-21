@@ -243,6 +243,22 @@ def wind_events(save_counter, save_counter_e, D_wind_strong, D_wind_very_strong,
     return save_counter, save_counter_e
 
 
+def filling_weather_alarm_chart():
+    statmt = "DELETE FROM `weather_alarm` WHERE w_a_id > 0"                     # Удаление всей информации из таблицы weather_alarm
+    cursor.execute(statmt)
+    cnx.commit()
+
+
+
+    if len(save) > 0:                                                               # Если есть информация для записи, то записываем 
+        stmt = "INSERT INTO weather_alarm (w_a_id, a_info) VALUES (%s, %s)"
+    else:                                                                           #   Если нет информации, то отпрвляем строку
+        t1_info = "Опасных природных явлений в ближайшие сутки не ожидается"
+        join = [1, t1_info]
+        save.append(join)
+        stmt = "INSERT INTO weather_alarm (w_a_id, a_info) VALUES (%s, %s)"
+    cursor.executemany(stmt, save)
+    cnx.commit()
 
 
 
@@ -298,49 +314,21 @@ save_counter, save_counter_e = pressure_events(save_counter, P_min, P_max, P_dif
 
 save_counter, save_counter_e = wind_events(save_counter, save_counter_e, D_wind_strong, D_wind_very_strong, D_storm)
 
-
-
-
-
-
-
-
-
-
-
-########## События, связанные с осадками ##########
-
-
-########## События, связанные с атмосферным давлением   ##########
-
-
-########## События, связанные с ветром   ##########
-
-
 ################################### Занесение информации в таблицу weather_alarm  #####################################
 
-# Удаление всей информации из таблицы weather_alarm
-statmt = "DELETE FROM `weather_alarm` WHERE w_a_id > 0" 
-cursor.execute(statmt)
-cnx.commit()
-
-#print len(save)
-
-if len(save) > 0:          # Если есть информация для записи   
-    stmt = "INSERT INTO weather_alarm (w_a_id, a_info) VALUES (%s, %s)"
-    cursor.executemany(stmt, save)
-    cnx.commit()
-else:
-    t1_info = "Опасных природных явлений в ближайшие сутки не ожидается"
-    join = [1, t1_info]
-    save.append(join)
-    stmt = "INSERT INTO weather_alarm (w_a_id, a_info) VALUES (%s, %s)"
-    cursor.executemany(stmt, save)
-    cnx.commit()
-
+filling_weather_alarm_chart()
 
 ################################### Занесение информации в таблицу weather_real  #####################################
 ########################################################################################################
+
+
+
+
+
+
+
+
+
 
 cursor.execute("SELECT * from weather_real")
 results = cursor.fetchall()   # Распечатка столбца, только данные, без скобок
