@@ -162,28 +162,15 @@ def downfall_events(save_counter, save_counter_e, D_start, D_sum, D_strong, D_ve
         save_counter_e = output_data_e(save_counter_e, D3)
         #print(save_counter_e, D3)
 
-
-
     if D_sum > 55:                                                                        #   Если выпадет более 10 мм осадков
         D3 = ('Ожидаются превышение среднесуточной нормы. ')
         D3 = D3 + (' За сутки выпадет ' + str(D_sum) + ' мм.')
         #print(save_counter,D3) 
         save_counter_e = output_data_e(save_counter_e, D3)
 
-
-
     return save_counter, save_counter_e
 
-
-
-
-
-
-
-
 def pressure_events(save_counter, P_min, P_max, P_dif):
-
-    P_dif = 10
 
     if P_min < 740:                               # Определение низкого давления, 740 мм
         p1_info = "В течении дня ожидается низкое давление "
@@ -191,13 +178,11 @@ def pressure_events(save_counter, P_min, P_max, P_dif):
         save_counter = output_data(save_counter, p1)
         #print(save_counter, p1)
 
-
     if P_max > 760:               # Определение высокого давления, более 760 мм
         p2_info = "В течении дня ожидается высокое давление "
         p2 = p2_info + str(P_max) + " мм. рт. ст."
         save_counter = output_data(save_counter, p2)
         #print(save_counter, p2)
-
 
     if P_dif > 5:               # Определение изменения давления за сутки более 5мм 
         p3_info = "Ожидается изменение давления более "
@@ -205,13 +190,61 @@ def pressure_events(save_counter, P_min, P_max, P_dif):
         save_counter = output_data(save_counter, p3)
         #print(save_counter, p3)
 
+    return save_counter, save_counter_e
+
+
+def wind_calculations():
+    i = 0
+    D_wind_strong = ''
+    D_wind_very_strong = ''
+    D_storm = ''
+ 
+    for z in data_w:
+        z = float(z)
+        if z > 5 and D_wind_strong == '':    
+            D_wind_strong = data_d[i]            #   Поиск времени начала сильного ветра
+        if z > 10 and D_wind_very_strong == '':    
+            D_wind_very_strong = data_d[i]       #   Поиск времени начала очень сильного ветра
+        if z > 15 and D_storm == '':
+            D_storm = data_d[i]       #   Поиск времени начала очень сильного ветра
+        i = i + 1
+
+    if D_wind_very_strong != '': D_wind_strong = '' 
+    if D_storm != '': 
+        D_wind_strong = ''
+        D_wind_very_strong = ''
+  
+    return D_wind_strong, D_wind_very_strong, D_storm 
 
 
 
 
+def wind_events(save_counter, save_counter_e, D_wind_strong, D_wind_very_strong, D_storm):
+
+    if D_wind_strong != '':
+        t1_info = "Ожидается сильный ветер "
+        t1 = t1_info + str(D_wind_strong)[8:10] + '-го в ' + str(D_wind_strong)[11:16] 
+        #print (t1)
+        save_counter = output_data(save_counter, t1)
+
+    if D_wind_very_strong != '':
+        t2_info = "Ожидается очень сильный ветер "
+        t2 = t2_info + str(D_wind_very_strong)[8:10] + '-го в ' + str(D_wind_very_strong)[11:16] 
+        #print (t2)
+        save_counter = output_data(save_counter, t2)
+
+    if D_storm != '':
+        t3_info = "Ожидается штормовой ветер "
+        t3 = t3_info + str(D_storm)[8:10] + '-го в ' + str(D_storm)[11:16] 
+        #print (t3)
+        save_counter_e = output_data_e(save_counter_e, t3)
 
 
-    
+    return save_counter, save_counter_e
+
+
+
+
 
    
 
@@ -249,7 +282,7 @@ P_min = float(min(data_p))   # минимальное давление за су
 P_max = float(max(data_p))   # максимальное давление за сутки
 P_dif = P_max - P_min  # разница
 
-
+D_wind_strong, D_wind_very_strong, D_storm = wind_calculations()
 
 
 
@@ -259,14 +292,12 @@ P_dif = P_max - P_min  # разница
 
 save_counter, save_counter_e = temperature_events(save_counter, save_counter_e)  #   Проверка событий, связанных с температурой 
 
-
 save_counter, save_counter_e = downfall_events(save_counter, save_counter_e, D_start, D_sum, D_strong, D_very_strong)
 
+save_counter, save_counter_e = pressure_events(save_counter, P_min, P_max, P_dif)
 
-pressure_events(save_counter, P_min, P_max, P_dif)
+save_counter, save_counter_e = wind_events(save_counter, save_counter_e, D_wind_strong, D_wind_very_strong, D_storm)
 
-
-#print(save_counter_e)
 
 
 
@@ -387,7 +418,7 @@ for wind in data_w:      # Поиск силы ветра более 10м/c и �
     if float(wind) > 10:  # Поиск времени начала сильного ветра 
         if flag_max_wind == 0: 
             time_w = str(data_d[i])[8:16]
-            print (time_w)
+            #print (time_w)
             flag_max_wind = 1
             t1_info = "Ожидается очень сильный ветер "
             t1 = t1_info + str(time_w)
