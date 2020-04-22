@@ -259,9 +259,6 @@ def filling_weather_alarm_chart():
 
 
 def filling_weather_real():
-
-
-
     cursor.execute("SELECT * from weather_real")
     results = cursor.fetchall()   # Распечатка столбца, только данные, без скобок
     last_line = cursor.rowcount
@@ -275,26 +272,26 @@ def filling_weather_real():
         r_p=row[3]
         data_rp.append(r_p)
 
-    ### Новые данные
-    w_r_id = last_line + 1
+    
+    w_r_id = last_line + 1                       # Новые данные
     w_d = data_d[0]
     w_t = data_t[0]
     w_p = data_p[0]
 
 
-    if last_line < 25:                               # Если количество элементов в таблице менее 25, то добавляем элементы
-        if (r_d != w_d):                             #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
+    if last_line < 25:                           # Если количество элементов в таблице менее 25, то добавляем элементы
+        if (r_d != w_d):                         #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
             cursor.execute("""INSERT INTO weather_real VALUES (%s,%s,%s,%s)""",(w_r_id, w_d, w_t, w_p)) 
             cnx.commit()
-    else:                                            #  Если таблица уже заполнена, то переносим данные в массивы
-        data_rd.append(w_d)                          # Заносим новые данные в массивы
+    else:                                        #  Если таблица уже заполнена, то переносим данные в массивы
+        data_rd.append(w_d)                      # Заносим новые данные в массивы
         data_rt.append(w_t)
         data_rp.append(w_p)
 
                                                  #   Строка №1 уходит, ее заменяет строка из новых данных
         i = 1
-        if (r_d != w_d):                             #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
-            while i < 26:                            # Значение 26
+        if (r_d != w_d):                         #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
+            while i < 26:                        # Значение 26
                 sts = """UPDATE `weather_real` SET w_d=%s, w_t=%s, w_p=%s  WHERE w_r_id=%s"""
                 datas=(data_rd[i], data_rt[i], data_rp[i], i)    
                 cursor.execute(sts,datas)
@@ -304,8 +301,17 @@ def filling_weather_real():
 
 
 
-
-
+def pressure_analysis(save_counter_e):
+    delta_t = float(data_rt[23])-float(data_rt[18])
+    delta_t = round(delta_t,2)
+    if delta_t > 4:
+        t1_info = "Внимание! Резкое повышение температуры за последние 5 часов "
+        t1 = t1_info + 'на ' + str(delta_t) + ' градусов'
+        save_counter_e = output_data_e(save_counter_e, t1)
+    if delta_t < -4:
+        t1_info = "Внимание! Резкое понижение температуры за последние 5 часов "
+        t1 = t1_info + 'на ' + str(delta_t) + ' градусов'
+        save_counter_e = output_data_e(save_counter_e, t1)
 
 
 
@@ -372,144 +378,13 @@ filling_weather_alarm_chart()
 
 filling_weather_real()
 
+##################################   Анализ данных в таблице weather_real   ##############################
 
-#cursor.execute("SELECT * from weather_real")
-#results = cursor.fetchall()   # Распечатка столбца, только данные, без скобок
-#last_line = cursor.rowcount
-
-#r_d = 0
-
-### Заносим данные из weather_real в массивы 
-#for row in results:
-#    r_d = row[1]
-#    data_rd.append(r_d)
-#    r_t=row[2]
-#    data_rt.append(r_t)
-#    r_p=row[3]
-#    data_rp.append(r_p)
-
-
-### Новые данные
-#w_r_id = last_line + 1
-#w_d = data_d[0]
-#w_t = data_t[0]
-#w_p = data_p[0]
-
-
-#if last_line < 25:                               # Если количество элементов в таблице менее 25, то добавляем элементы
-#    if (r_d != w_d):                             #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
-#        cursor.execute("""INSERT INTO weather_real VALUES (%s,%s,%s,%s)""",(w_r_id, w_d, w_t, w_p)) 
-#        cnx.commit()
-#else:                                            #  Если таблица уже заполнена, то переносим данные в массивы
-#    data_rd.append(w_d)                          # Заносим новые данные в массивы
-#    data_rt.append(w_t)
-#    data_rp.append(w_p)
-
-                                                 #   Строка №1 уходит, ее заменяет строка из новых данных
-#    i = 1
-#    if (r_d != w_d):                             #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
-#        while i < 26:                            # Значение 26
-#            sts = """UPDATE `weather_real` SET w_d=%s, w_t=%s, w_p=%s  WHERE w_r_id=%s"""
-#            datas=(data_rd[i], data_rt[i], data_rp[i], i)    
-#            cursor.execute(sts,datas)
-#            cnx.commit()
-#            #print (data_rd[i], data_rt[i], data_rp[i], i)
-#            i = i + 1
+pressure_analysis(save_counter_e)
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-#for row in results:
-#    r_id=row[0]
-#    data_id.append(r_id)            # Занесение данных ID в массив
-#    r_d=row[1]
-#    data_rd.append(r_d)
-#    r_t=row[2]
-#    data_rt.append(r_t)
-#    r_p=row[3]
-#    data_rp.append(r_p)
-
-
-##### Занесение новой информации в таблицу
-
-#w_r_id=max(data_id) + 1
-#w_d = data_d[0]
-#w_t = data_t[0]
-#w_p = data_p[0]
-
-#### Добавляем строку
-
-#if r_d <> w_d:       # Добавление строки только если время увеличивается  
-#    cursor.execute("""INSERT INTO weather_real VALUES (%s,%s,%s,%s)""",(w_r_id, w_d, w_t, w_p)) 
-#    cnx.commit()
-
-#### Удаляем старую строку
-
-#if last_line > 24:
-#    sts = "DELETE FROM `weather_real` ORDER BY w_r_id ASC LIMIT 1"
-#    cursor.execute(sts)
-#    cnx.commit()
-
-#### Вариант UPDATE, не используется
-
-#g=555
-#title=11
-
-#sts = """UPDATE `weather_real` SET w_p=%s WHERE w_r_id=%s"""
-#datas=(g,title)
-#cursor.execute(sts,datas)
-#cnx.commit()
-
-
-
-
-##################################   Считывание и анализ данных в таблице weather_real   ##############################
-
-### Проверка резкого изменения температуры за последние 5 часов
-
-res_delta_t = 0    # Переменная, указывает на время роста температуры в течении 5 часов на 5 градусов
-res_delta_tm = 0   # Переменная, указывает на время падения температуры в течении 5 часов на 5 градусов
-
-try:
-   delta_t = float(data_rt[23])-float(data_rt[18])
-except ValueError:
-   #delta_t = int(abs(data_rt[23]))-int(abs(data_rt[18]))
-   print("ValueError")
-   sys.exit()
-
-
-if delta_t > 4:
-    t1_info = "Внимание! Резкое повышение температуры за последние 5 часов "
-    t1 = t1_info
-    #join = [save_counter_e, t1]
-    #save_e.append(join)
-    #save_counter_e = save_counter_e +1
-    #print data_rd[23]
-  
-if delta_t < -4:
-    t1_info = "Внимание! Резкое понижение температуры за последние 5 часов "
-    t1 = t1_info
-    #join = [save_counter_e, t1]
-    #save_e.append(join)
-    #save_counter_e = save_counter_e +1
-    #print data_rd[23]
-
-
-
-#print delta_t
-
-#print data_rd[res_delta_t] 
 
 ### Проверка резкого изменения давления за последние 5 часов
 
