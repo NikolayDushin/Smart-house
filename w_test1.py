@@ -92,7 +92,7 @@ def temperature_events(save_counter, save_counter_e):
 
     #print(save_counter_e)
 
-    T_max = 70        
+    #T_max = 70        
 
     if T_dif > 10:                            # Если температура вырастет более чем на 10 С за сутки 
         t1_info = "В течении суток ожидается рост температуры на "
@@ -238,8 +238,6 @@ def wind_events(save_counter, save_counter_e, D_wind_strong, D_wind_very_strong,
         t3 = t3_info + str(D_storm)[8:10] + '-го в ' + str(D_storm)[11:16] 
         #print (t3)
         save_counter_e = output_data_e(save_counter_e, t3)
-
-
     return save_counter, save_counter_e
 
 
@@ -247,8 +245,6 @@ def filling_weather_alarm_chart():
     statmt = "DELETE FROM `weather_alarm` WHERE w_a_id > 0"                     # Удаление всей информации из таблицы weather_alarm
     cursor.execute(statmt)
     cnx.commit()
-
-
 
     if len(save) > 0:                                                               # Если есть информация для записи, то записываем 
         stmt = "INSERT INTO weather_alarm (w_a_id, a_info) VALUES (%s, %s)"
@@ -259,6 +255,60 @@ def filling_weather_alarm_chart():
         stmt = "INSERT INTO weather_alarm (w_a_id, a_info) VALUES (%s, %s)"
     cursor.executemany(stmt, save)
     cnx.commit()
+
+
+
+def filling_weather_real():
+
+
+
+    cursor.execute("SELECT * from weather_real")
+    results = cursor.fetchall()   # Распечатка столбца, только данные, без скобок
+    last_line = cursor.rowcount
+
+    r_d = 0
+    for row in results:                          # Заносим данные из weather_real в массивы 
+        r_d = row[1]
+        data_rd.append(r_d)
+        r_t=row[2]
+        data_rt.append(r_t)
+        r_p=row[3]
+        data_rp.append(r_p)
+
+    ### Новые данные
+    w_r_id = last_line + 1
+    w_d = data_d[0]
+    w_t = data_t[0]
+    w_p = data_p[0]
+
+
+    if last_line < 25:                               # Если количество элементов в таблице менее 25, то добавляем элементы
+        if (r_d != w_d):                             #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
+            cursor.execute("""INSERT INTO weather_real VALUES (%s,%s,%s,%s)""",(w_r_id, w_d, w_t, w_p)) 
+            cnx.commit()
+    else:                                            #  Если таблица уже заполнена, то переносим данные в массивы
+        data_rd.append(w_d)                          # Заносим новые данные в массивы
+        data_rt.append(w_t)
+        data_rp.append(w_p)
+
+                                                 #   Строка №1 уходит, ее заменяет строка из новых данных
+        i = 1
+        if (r_d != w_d):                             #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
+            while i < 26:                            # Значение 26
+                sts = """UPDATE `weather_real` SET w_d=%s, w_t=%s, w_p=%s  WHERE w_r_id=%s"""
+                datas=(data_rd[i], data_rt[i], data_rp[i], i)    
+                cursor.execute(sts,datas)
+                cnx.commit()
+                #print (data_rd[i], data_rt[i], data_rp[i], i)
+                i = i + 1
+
+
+
+
+
+
+
+
 
 
 
@@ -319,73 +369,60 @@ save_counter, save_counter_e = wind_events(save_counter, save_counter_e, D_wind_
 filling_weather_alarm_chart()
 
 ################################### Занесение информации в таблицу weather_real  #####################################
-########################################################################################################
+
+filling_weather_real()
 
 
+#cursor.execute("SELECT * from weather_real")
+#results = cursor.fetchall()   # Распечатка столбца, только данные, без скобок
+#last_line = cursor.rowcount
 
-
-
-
-
-
-
-
-cursor.execute("SELECT * from weather_real")
-results = cursor.fetchall()   # Распечатка столбца, только данные, без скобок
-last_line = cursor.rowcount
-
-r_d = 0
+#r_d = 0
 
 ### Заносим данные из weather_real в массивы 
-for row in results:
-    r_d = row[1]
-    data_rd.append(r_d)
-    r_t=row[2]
-    data_rt.append(r_t)
-    r_p=row[3]
-    data_rp.append(r_p)
-    #print r_d
+#for row in results:
+#    r_d = row[1]
+#    data_rd.append(r_d)
+#    r_t=row[2]
+#    data_rt.append(r_t)
+#    r_p=row[3]
+#    data_rp.append(r_p)
 
 
 ### Новые данные
-w_r_id = last_line + 1
-w_d = data_d[0]
-w_t = data_t[0]
-w_p = data_p[0]
-#print w_r_id, w_d, w_t, w_p
-
-#print last_line
-
-### Если количество элементов в таблице менее 25, то добавляем элементы
-
-if last_line < 25:          # Значение 25
-    if (r_d != w_d):
-        cursor.execute("""INSERT INTO weather_real VALUES (%s,%s,%s,%s)""",(w_r_id, w_d, w_t, w_p)) 
-        cnx.commit()
-
-###  Если таблица уже заполнена, то переносим данные в массивы
-else:
-    ### Заносим новые данные в массивы
-    data_rd.append(w_d)
-    data_rt.append(w_t)
-    data_rp.append(w_p)
-
-    ### Строка №1 уходит, ее заменяет строка из новых данных
-    i = 1
-    while i < 26:           # Значение 26
-        sts = """UPDATE `weather_real` SET w_d=%s, w_t=%s, w_p=%s  WHERE w_r_id=%s"""
-        datas=(data_rd[i], data_rt[i], data_rp[i], i)    
-        cursor.execute(sts,datas)
-        cnx.commit()
-        #print data_rd[i], data_rt[i], data_rp[i], i
-        i = i + 1
+#w_r_id = last_line + 1
+#w_d = data_d[0]
+#w_t = data_t[0]
+#w_p = data_p[0]
 
 
-#print w_d
-#print r_d
+#if last_line < 25:                               # Если количество элементов в таблице менее 25, то добавляем элементы
+#    if (r_d != w_d):                             #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
+#        cursor.execute("""INSERT INTO weather_real VALUES (%s,%s,%s,%s)""",(w_r_id, w_d, w_t, w_p)) 
+#        cnx.commit()
+#else:                                            #  Если таблица уже заполнена, то переносим данные в массивы
+#    data_rd.append(w_d)                          # Заносим новые данные в массивы
+#    data_rt.append(w_t)
+#    data_rp.append(w_p)
 
-#print data_d[0], data_t[0], data_p[0]
-#print data_d[1], data_t[1], data_p[1]
+                                                 #   Строка №1 уходит, ее заменяет строка из новых данных
+#    i = 1
+#    if (r_d != w_d):                             #   Проверка на задвоение, если запуск подпрограммы происходит более 1 раза в час
+#        while i < 26:                            # Значение 26
+#            sts = """UPDATE `weather_real` SET w_d=%s, w_t=%s, w_p=%s  WHERE w_r_id=%s"""
+#            datas=(data_rd[i], data_rt[i], data_rp[i], i)    
+#            cursor.execute(sts,datas)
+#            cnx.commit()
+#            #print (data_rd[i], data_rt[i], data_rp[i], i)
+#            i = i + 1
+
+
+
+
+
+
+
+
 
 
 
@@ -433,6 +470,9 @@ else:
 #datas=(g,title)
 #cursor.execute(sts,datas)
 #cnx.commit()
+
+
+
 
 ##################################   Считывание и анализ данных в таблице weather_real   ##############################
 
