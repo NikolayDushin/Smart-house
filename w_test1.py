@@ -301,7 +301,7 @@ def filling_weather_real():
 
 
 
-def pressure_analysis(save_counter_e):
+def temperature_analysis(save_counter_e):
     delta_t = float(data_rt[23])-float(data_rt[18])
     delta_t = round(delta_t,2)
     if delta_t > 4:
@@ -313,11 +313,37 @@ def pressure_analysis(save_counter_e):
         t1 = t1_info + 'на ' + str(delta_t) + ' градусов'
         save_counter_e = output_data_e(save_counter_e, t1)
 
+def pressure_analysis(save_counter_e):
+    delta_p = int(data_rp[23])-int(data_rp[18])
+    if delta_p > 4:
+        t1_info = "Внимание! Резкое повышение атмосферного давления за последние 5 часов "
+        t1 = t1_info + 'на ' + str(delta_p) + ' мм. рт. ст.'
+        #print(t1)
+        save_counter_e = output_data_e(save_counter_e, t1)
+    if delta_p < -4:
+        t1_info = "Внимание! Резкое понижение атмосферного давления за последние 5 часов "
+        t1 = t1_info + 'на ' + str(delta_p) + ' мм. рт. ст.'
+        #print(t1)
+        save_counter_e = output_data_e(save_counter_e, t1)
 
 
+def saving_extreme_info():
 
+    statmt = "DELETE FROM `weather_extreme` WHERE w_e_id > 0"             # Удаление всей информации из таблицы weather_extreme
+    cursor.execute(statmt)
+    cnx.commit()
 
-
+    if len(save_e) > 0:          # Если есть информация для записи   
+        stmt = "INSERT INTO weather_extreme (w_e_id, e_info) VALUES (%s, %s)"
+        cursor.executemany(stmt, save_e)
+        cnx.commit()
+    else:
+        t1 = "Экстримальных природных явлений в ближайшие сутки не ожидается"
+        join = [1, t1]
+        save_e.append(join)
+        stmt = "INSERT INTO weather_extreme (w_e_id, e_info) VALUES (%s, %s)"
+        cursor.executemany(stmt, save_e)
+        cnx.commit()
    
 
 ##############################################   Подключение к базе MySQL   ###########################################
@@ -380,61 +406,13 @@ filling_weather_real()
 
 ##################################   Анализ данных в таблице weather_real   ##############################
 
+temperature_analysis(save_counter_e)             #   Поиск информации 
+
 pressure_analysis(save_counter_e)
-
-
-
-
-
-### Проверка резкого изменения давления за последние 5 часов
-
-
-res_delta_p = 0    # Переменная, указывает на время роста температуры в течении 5 часов на 5 градусов
-res_delta_pm = 0   # Переменная, указывает на время падения температуры в течении 5 часов на 5 градусов
-
-delta_p = int(data_rp[23])-int(data_rp[18])
-
-#delta_p=-5
-
-if delta_p > 4:
-    t1_info = "Внимание! Резкое повышение атмосферного давления за последние 5 часов "
-    t1 = t1_info
-    #join = [save_counter_e, t1]
-    #save_e.append(join)
-    #save_counter_e = save_counter_e +1
-    #print data_rp[23] 
-
-if delta_p < -4:
-    t1_info = "Внимание! Резкое понижение атмосферного давления за последние 5 часов "
-    t1 = t1_info
-    #join = [save_counter_e, t1]
-    #save_e.append(join)
-    #save_counter_e = save_counter_e +1
-    #print data_rp[23]
-
 
 
 ################################### Занесение информации в таблицу weather_extreme  #####################################
 
-# Удаление всей информации из таблицы weather_extreme
-statmt = "DELETE FROM `weather_extreme` WHERE w_e_id > 0" 
-cursor.execute(statmt)
-cnx.commit()
-
-if len(save_e) > 0:          # Если есть информация для записи   
-    stmt = "INSERT INTO weather_extreme (w_e_id, e_info) VALUES (%s, %s)"
-    cursor.executemany(stmt, save_e)
-    cnx.commit()
-else:
-    t1 = "Экстримальных природных явлений в ближайшие сутки не ожидается"
-    #w_e_id = 1
-    join = [1, t1]
-    save_e.append(join)
-    stmt = "INSERT INTO weather_extreme (w_e_id, e_info) VALUES (%s, %s)"
-    cursor.executemany(stmt, save_e)
-    cnx.commit()
-
-
+saving_extreme_info()                            # Удаление всей информации из таблицы weather_extreme
 
 cursor.close()  
-  
