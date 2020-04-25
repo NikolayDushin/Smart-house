@@ -89,11 +89,6 @@ def output_data_e(save_counter_e, t1):               #   Подготовка с
 
 
 def temperature_events(save_counter, save_counter_e):
-
-    #print(save_counter_e)
-
-    #T_max = 70        
-
     if T_dif > 10:                            # Если температура вырастет более чем на 10 С за сутки 
         t1_info = "В течении суток ожидается рост температуры на "
         t1 = t1_info + str(T_dif) + " C"
@@ -163,11 +158,10 @@ def downfall_events(save_counter, save_counter_e, D_start, D_sum, D_strong, D_ve
         #print(save_counter_e, D3)
 
     if D_sum > 55:                                                                        #   Если выпадет более 10 мм осадков
-        D3 = ('Ожидаются превышение среднесуточной нормы. ')
+        D3 = ('Ожидаются превышение среднесуточной нормы осадков. ')
         D3 = D3 + (' За сутки выпадет ' + str(D_sum) + ' мм.')
         #print(save_counter,D3) 
         save_counter_e = output_data_e(save_counter_e, D3)
-
     return save_counter, save_counter_e
 
 def pressure_events(save_counter, P_min, P_max, P_dif):
@@ -198,7 +192,7 @@ def wind_calculations():
     D_wind_strong = ''
     D_wind_very_strong = ''
     D_storm = ''
- 
+
     for z in data_w:
         z = float(z)
         if z > 5 and D_wind_strong == '':    
@@ -215,8 +209,6 @@ def wind_calculations():
         D_wind_very_strong = ''
   
     return D_wind_strong, D_wind_very_strong, D_storm 
-
-
 
 
 def wind_events(save_counter, save_counter_e, D_wind_strong, D_wind_very_strong, D_storm):
